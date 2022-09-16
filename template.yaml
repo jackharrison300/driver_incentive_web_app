@@ -130,8 +130,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      CodeUri: s3://app-default-cfn-deployments-19552/2e157ca2a701b5e7fd7e145dc1e350f6
-      Runtime: nodejs14.x
+      CodeUri: ./server
+      Runtime: nodejs16.x
       Architectures:
       - x86_64
       MemorySize: 1152
