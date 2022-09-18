@@ -3,7 +3,8 @@ version: '3'
 services:
 
   mysql-development:
-    image: mysql:8.0.17
+    #    image: arm64v8/mysql:latest
+    image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: helloworld
       MYSQL_DATABASE: testapp
