@@ -9,3 +9,11 @@
 There's an additional library which adds on to the react library, called [React Native](https://reactnative.dev/). 
 It also has a [tutorial](https://reactnative.dev/docs/getting-started), though there's not a finished product like with the other one. 
 If you decide to read the tutorial, be warned: it's somewhat long with many pages worth of content. Though the content is very helpful, such as [how to set up your environment](https://reactnative.dev/docs/environment-setup).
+
+## Libraries we should use
+
+- React Query
+    - this is a useful wrapper for managing the data we get from Remix and any API calls we make. You wrap your request (or hook) and you can pull out useful state variables such as the data, isLoading, isSuccess, etc.
+    - It's also a really good tool for state management. You can use it to cache very data heavy request responses (for instance our product catalog). It makes things really easy to develop compared to trying to manage React's state yourself
+- React testing library / jest
+    - Used to write front-end unit tests. As testing libraries go, it's not terrible, but it is kinda fiddly. Still useful when designing complicated from ends.
