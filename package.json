@@ -28,6 +28,7 @@
   "dependencies": {
     "@architect/architect": "^10.4.1",
     "@architect/functions": "^5.2.1",
+    "@prisma/client": "^4.3.1",
     "@remix-run/architect": "^1.7.0",
     "@remix-run/node": "^1.7.0",
     "@remix-run/react": "^1.7.0",
@@ -67,6 +68,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.13",
+    "prisma": "^4.3.1",
     "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.1.8",
     "ts-node": "^10.9.1",

@@ -11,3 +11,6 @@ sam.yaml
 /cypress/videos
 
 /app/styles/tailwind.css
+
+# used for jack's local development
+2samconfig.toml
