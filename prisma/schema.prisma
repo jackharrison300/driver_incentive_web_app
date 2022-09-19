@@ -14,9 +14,8 @@ enum Role {
 }
 
 enum EnrollmentStatus {
-  NOT_BEGUN
-  IN_PROGRESS
-  PENDING_APPROVAL
+  NOT_APPLIED
+  APPLICATION_PENDING
   REJECTED
   ENROLLED
   UNENROLLED
@@ -30,6 +29,12 @@ enum PointChangeType {
 enum PurchaseStatus {
   IN_CART
   PURCHASED
+  DELETED_FROM_CART
+}
+
+enum PasswordChangeType {
+  INITIAL_CREATION
+  FORGOT_PASSWORD
 }
 
 // enables soft-delete
@@ -48,7 +53,7 @@ model Company {
   drivers Driver[]
   sponsors Sponsor[]
   pointTypes PointType[]
-  pointDollarValue Int
+  pointDollarValue Decimal
 
   @@index([activeStatus])
 }
@@ -84,6 +89,7 @@ model Sponsor {
   approvedDriverApplications DriverApplication[]
   createdPointTypes PointType[]
   createdPointChanges PointChange[]
+  catalogItems CatalogItem[]
 }
 
 model Driver {
@@ -96,6 +102,7 @@ model Driver {
   pointChanges PointChange[]
   // this is one-to-many to enable soft-delete of applications
   driverApplications DriverApplication[]
+  purchases Purchase[]
 }
 
 model DriverApplication {
@@ -105,10 +112,11 @@ model DriverApplication {
   activeStatus ActiveStatus
   driver Driver @relation(fields: [driverId], references: [userId])
   driverId Int
-  applicationText String @db.Text
+  applicationPdfUrl String
   approver Sponsor @relation(fields: [approverId], references: [userId])
   approverId Int
   approvalDate DateTime
+  rejectionReason String? @db.Text
 
   @@index([activeStatus])
 }
@@ -126,9 +134,10 @@ model PointChange {
   pointValue Int
   pointType PointType? @relation(fields: [pointTypeId], references: [id])
   pointTypeId Int
-  pointChangeDescription String @db.Text
+  pointChangeReason String @db.Text
   // for negative point changes
-  // purchase 
+  purchase Purchase? @relation(fields: [purchaseId], references: [id])
+  purchaseId Int? @unique
 
   @@index([activeStatus])
 }
@@ -152,27 +161,64 @@ model PointType {
 }
 
 model Vendor {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  vendorName String
+  vendorDescription String @db.Text
+  vendorLogoUrl String
+  vendorApi String
+  apiKey String
+  catalogItems CatalogItem[]
 
+  @@index([activeStatus])
 }
 
 model CatalogItem {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  vendorProductId String
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  vendorId Int
+  sponsor Sponsor @relation(fields: [sponsorId], references: [userId])
+  sponsorId Int
+  purchases Purchase[]
 
+  @@index([activeStatus])
 }
 
 model Purchase {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  catalogItem CatalogItem @relation(fields: [catalogItemId], references: [id])
+  catalogItemId Int
+  purchaseStatus PurchaseStatus
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  pointChange PointChange?
 
+  @@index([activeStatus])
 }
 
 model PasswordChange {
-  
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordChangeDatetime DateTime
+  email String
+  passwordChangeType PasswordChangeType
 }
 
 model LoginAttempt {
-
-}
-
-model RefreshToken {
-  refreshToken String @id
-  accessToken String @unique
-  lastChecked DateTime @default(now())
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordChangeDatetime DateTime
+  email String
+  wasSuccessful Boolean @default(false)
 }
