@@ -1,3 +1,5 @@
+# Local DB
+
 To set up a local mysql db and connect to it:
 
 Install docker desktop
