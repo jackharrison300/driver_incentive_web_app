@@ -173,8 +173,6 @@ Resources:
       Timeout: 5
       Environment:
         Variables:
-          DATABASE_USERNAME: '{{resolve:secretsmanager:T25DBSecret:SecretString:username}}'
-          DATABASE_PASSWORD: '{{resolve:secretsmanager:T25DBSecret:SecretString:password}}'
           DATABASE_URL:
             Fn::Join:
             - ''

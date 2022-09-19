@@ -7,27 +7,172 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  SPONSOR
+  DRIVER
+}
+
+enum EnrollmentStatus {
+  NOT_BEGUN
+  IN_PROGRESS
+  PENDING_APPROVAL
+  REJECTED
+  ENROLLED
+  UNENROLLED
+}
+
+enum PointChangeType {
+  Positive
+  Negative
+}
+
+enum PurchaseStatus {
+  IN_CART
+  PURCHASED
+}
+
+// enables soft-delete
+enum ActiveStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  name String @unique
+  logoUrl String @unique
+  drivers Driver[]
+  sponsors Sponsor[]
+  pointTypes PointType[]
+  pointDollarValue Int
+
+  @@index([activeStatus])
+}
+
 model User {
-  id    String @id @default(cuid())
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
   email String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  password Password?
-  notes    Note[]
+  firstName String
+  lastName String
+  role Role
+  driver Driver?
+  sponsor Sponsor?
+  admin Admin?
+
+  @@index([activeStatus])
 }
 
-model Password {
-  hash String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String @unique
+model Admin {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
 }
 
-model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
+model Sponsor {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  approvedDriverApplications DriverApplication[]
+  createdPointTypes PointType[]
+  createdPointChanges PointChange[]
+}
+
+model Driver {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  enrollmentStatus EnrollmentStatus
+  pointChanges PointChange[]
+  // this is one-to-many to enable soft-delete of applications
+  driverApplications DriverApplication[]
+}
+
+model DriverApplication {
+  id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  activeStatus ActiveStatus
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  applicationText String @db.Text
+  approver Sponsor @relation(fields: [approverId], references: [userId])
+  approverId Int
+  approvalDate DateTime
+
+  @@index([activeStatus])
+}
+
+model PointChange {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  pointChangeType PointChangeType
+  pointChangeCreator Sponsor @relation(fields: [pointChangeCreatorId], references: [userId])
+  pointChangeCreatorId Int
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  pointValue Int
+  pointType PointType? @relation(fields: [pointTypeId], references: [id])
+  pointTypeId Int
+  pointChangeDescription String @db.Text
+  // for negative point changes
+  // purchase 
+
+  @@index([activeStatus])
+}
+
+// Sponsor-defined Point Type
+model PointType {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  activeStatus ActiveStatus
+  pointTypeName String
+  pointTypeDescription String @db.Text
+  pointTypeValue Int
+  creator Sponsor @relation(fields: [creatorId], references: [userId])
+  creatorId Int
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  pointChanges PointChange[]
+
+  @@index([activeStatus])
+}
+
+model Vendor {
+
+}
+
+model CatalogItem {
+
+}
+
+model Purchase {
+
+}
+
+model PasswordChange {
+  
+}
+
+model LoginAttempt {
+
+}
+
+model RefreshToken {
+  refreshToken String @id
+  accessToken String @unique
+  lastChecked DateTime @default(now())
 }
