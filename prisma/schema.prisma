@@ -85,8 +85,8 @@ model Driver {
   user User @relation(fields: [userId], references: [id])
   userId Int @id
   updatedAt DateTime @updatedAt
-  company Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  company Company? @relation(fields: [companyId], references: [id])
+  companyId Int?
   enrollmentStatus EnrollmentStatus
   pointChanges PointChange[]
   // this is one-to-many to enable soft-delete of applications
