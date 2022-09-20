@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SPONSOR
+  DRIVER
+}
+
+enum EnrollmentStatus {
+  NOT_APPLIED
+  APPLICATION_PENDING
+  REJECTED
+  ENROLLED
+  UNENROLLED
+}
+
+enum PurchaseStatus {
+  IN_CART
+  PURCHASED
+  DELETED_FROM_CART
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  name String @unique
+  logoUrl String @unique
+  pointDollarValue Decimal
+  sponsors Sponsor[]
+  drivers Driver[]
+  catalogItems CatalogItem[]
+  pointTypes PointType[]
+  pointChanges PointChange[]
+
+  @@index([isActive])
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  email String @unique
+  firstName String
+  lastName String
+  role Role
+  driver Driver?
+  sponsor Sponsor?
+  admin Admin?
+
+  @@index([isActive])
+}
+
+model Admin {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
+}
+
+model Sponsor {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  approvedDriverApplications DriverApplication[]
+  createdPointTypes PointType[]
+  createdPointChanges PointChange[]
+}
+
+model Driver {
+  user User @relation(fields: [userId], references: [id])
+  userId Int @id
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  enrollmentStatus EnrollmentStatus
+  pointChanges PointChange[]
+  // this is one-to-many to enable soft-delete of applications
+  driverApplications DriverApplication[]
+  purchases Purchase[]
+}
+
+model DriverApplication {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  applicationPdfUrl String
+  approver Sponsor @relation(fields: [approverId], references: [userId])
+  approverId Int
+  approvalDate DateTime
+  rejectionReason String? @db.Text
+
+  @@index([isActive])
+}
+
+model PointChange {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  pointChangeCreator Sponsor @relation(fields: [pointChangeCreatorId], references: [userId])
+  pointChangeCreatorId Int
+  // intentionally not-normalized for simplicity of querying by company
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  pointValue Int
+  pointType PointType? @relation(fields: [pointTypeId], references: [id])
+  pointTypeId Int?
+  pointChangeReason String @db.Text
+  // for purchase-driven (i.e., negative) point changes
+  purchase Purchase? @relation(fields: [purchaseId], references: [id])
+  purchaseId Int? @unique
+
+  @@index([isActive, driverId, companyId, createdAt])
+}
+
+// Sponsor-defined Point Type
+model PointType {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  pointTypeName String
+  pointTypeDescription String @db.Text
+  pointTypeValue Int
+  creator Sponsor @relation(fields: [creatorId], references: [userId])
+  creatorId Int
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  pointChanges PointChange[]
+
+  @@index([isActive])
+}
+
+model Vendor {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  vendorName String
+  vendorDescription String @db.Text
+  vendorLogoUrl String
+  vendorApi String
+  apiKey String
+  catalogItems CatalogItem[]
+
+  @@index([isActive])
+}
+
+model CatalogItem {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  vendorProductId String
+  // intentionally not-normalized for simplicity of queries
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  vendorId Int
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  purchases Purchase[]
+
+  @@index([isActive, companyId])
+}
+
+model Purchase {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive Boolean @default(true)
+  catalogItem CatalogItem @relation(fields: [catalogItemId], references: [id])
+  catalogItemId Int
+  purchaseStatus PurchaseStatus
+  driver Driver @relation(fields: [driverId], references: [userId])
+  driverId Int
+  pointChange PointChange?
+
+  @@index([isActive])
+}
+
+model PasswordChange {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordChangeDatetime DateTime
+  email String
+  isInitialCreation Boolean
+}
+
+model LoginAttempt {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordChangeDatetime DateTime
+  email String
+  wasSuccessful Boolean @default(false)
+}
