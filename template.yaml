@@ -1,7 +1,85 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Exported by architect/package@8.1.5 on 2022-09-16T01:06:41.300Z
+
+Parameters:
+  ClientDomains:
+    Type: CommaDelimitedList
+    Description: Array of allowable domains for the t25users Cognito user pool
+  AdminEmail: 
+    Type: String
+    Description: Email address for proto-administrator
+
 Resources:
+  # Cognito
+  UserPool: 
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: t25users
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: t25client
+      GenerateSecret: false
+      RefreshTokenValidity: 30      # 30 day refresh on token
+      CallbackURLs: !Ref ClientDomains
+      LogoutURLs: !Ref ClientDomains
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: t25
+      UserPoolId: !Ref UserPool
+  AdminUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admins
+      Description: Admin user group
+      Precedence: 0 # the lower number has priority if a user belongs to many groups
+      UserPoolId: !Ref UserPool
+  UnsponsoredDriverGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: unsponsored_drivers
+      Description: Driver users that have not been approved yet
+      Precedence: 10
+      UserPoolId: !Ref UserPool
+  ProtoAdminUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: !Ref AdminEmail
+      DesiredDeliveryMediums:
+        - EMAIL
+      ForceAliasCreation: true
+      UserAttributes:
+        - Name: email
+          Value: !Ref AdminEmail
+      UserPoolId: !Ref UserPool
+  AttachProtoAdminUser:
+    Type: AWS::Cognito::UserPoolUserToGroupAttachment
+    Properties:
+      GroupName: admins
+      Username: !Ref AdminEmail
+      UserPoolId: !Ref UserPool  
+
+
   Role:
     Type: AWS::IAM::Role
     Properties:
@@ -209,6 +287,17 @@ Resources:
                 Ref: StaticBucket
           Sid: PublicReadGetObject
 Outputs:
+  # Cognito
+  UserPoolId:
+    Description: "Cognito user pool ID"
+    Value: !Ref UserPool
+  UserPoolClientId:
+    Description: "Cognito user pool client ID"
+    Value: !Ref UserPoolClient
+  AuthUrl:
+    Description:
+    Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
+
   API:
     Description: API Gateway (HTTP)
     Value:
