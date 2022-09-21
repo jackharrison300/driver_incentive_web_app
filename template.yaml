@@ -51,58 +51,6 @@ Resources:
             Condition:
               StringEquals:
                 'secretsmanager:ResourceTag/team25': db
-  StaticBucketParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name:
-        Fn::Sub:
-        - /${AWS::StackName}/static/${key}
-        - key: bucket
-      Value:
-        Ref: StaticBucket
-  StaticFingerprintParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name:
-        Fn::Sub:
-        - /${AWS::StackName}/static/${key}
-        - key: fingerprint
-      Value: 'false'
-  ParameterStorePolicy:
-    Type: AWS::IAM::Policy
-    DependsOn: Role
-    Properties:
-      PolicyName: ArcParameterStorePolicy
-      PolicyDocument:
-        Statement:
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}
-            - {}
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*
-            - {}
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*/*
-            - {}
-      Roles:
-      - Ref: Role
   HTTP:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -135,6 +83,28 @@ Resources:
                       Ref: StaticBucket
                 connectionType: INTERNET
                 timeoutInMillis: 30000
+  T25VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+  T25Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: T25VPC
+  T25Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: T25VPC
+  T25SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: 'Team 25 Subnet Group'
+      DBSubnetGroupName: T25SubnetGroup
+      SubnetIds: 
+        - Ref: T25Subnet1
+        - Ref: T25Subnet2
   DBSecret:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
@@ -158,6 +128,8 @@ Resources:
       Engine: mysql
       MasterUsername: '{{resolve:secretsmanager:T25DBSecret:SecretString:username}}'
       MasterUserPassword: '{{resolve:secretsmanager:T25DBSecret:SecretString:password}}'
+      PubliclyAccessible: true
+      DBSubnetGroupName: T25SubnetGroup
     DependsOn: DBSecret
   GetCatchallHTTPLambda:
     Type: AWS::Serverless::Function
