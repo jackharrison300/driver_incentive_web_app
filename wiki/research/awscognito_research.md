@@ -9,7 +9,15 @@ From the docs: Amazon Cognito provides authentication, authorization, and user m
 - JWT decoding libs https://openid.net/developers/jwt/ 
 - JWT info https://www.rfc-editor.org/rfc/rfc7517
 
-## Cognito Flow
+## Dynamic Link 
+ - Cognito hosted login UI w/ access code
+     - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
+ - Cognito hosted login UI w/ access token
+     - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
+ - Cognito user pool JWKS
+     - https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
+
+# Cognito auth Flow
 
 ### SAM start up reqs
 
