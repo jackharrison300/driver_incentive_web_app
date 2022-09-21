@@ -12,7 +12,7 @@ From the docs: Amazon Cognito provides authentication, authorization, and user m
 ## Dynamic Link 
  - Cognito hosted login UI w/ access code
      - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
- - Cognito hosted login UI w/ access token
+ - Cognito hosted login UI w/ access token (probably only use this in dev for postman testing)
      - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
  - Cognito user pool JWKS
      - https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
@@ -36,6 +36,21 @@ From the docs: Amazon Cognito provides authentication, authorization, and user m
  - Populate base app page with data depending on cognito:groups
     - For company "foo", there should be "foo_drivers" and "foo_sponsors" user groups created dynamically.
 
+### Authorizing server resources with JWT
+We will get the user pool from our JWT, with that string, we can authorize specific routes.
+
+Example of user group names:
+
+ - admin
+ - unsponsored_drivers
+ - foo_sponsors
+ - foo_drivers
+ - bar_sponsors
+ - bar_drivers
+ - baz_sponsors
+ - baz_drivers
+
+We can write a utility function to check our JWT for this user group name.
 
 ### Adding a Company as an admin
  - Login as admin
