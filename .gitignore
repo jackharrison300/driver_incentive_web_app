@@ -1,6 +1,6 @@
 node_modules
 
-/server/index.js
+/server
 /public/build
 preferences.arc
 sam.json
@@ -11,6 +11,8 @@ sam.yaml
 /cypress/videos
 
 /app/styles/tailwind.css
+
+/layer
 
 # used for jack's local development
 2samconfig.toml
