@@ -295,7 +295,7 @@ Outputs:
     Description: "Cognito user pool client ID"
     Value: !Ref UserPoolClient
   AuthUrl:
-    Description:
+    Description: "Cognito hosted ui url"
     Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
 
   API:
