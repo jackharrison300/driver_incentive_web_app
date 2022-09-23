@@ -12,3 +12,6 @@ Tailwind styling is a great option. A couple Remix stacks have it preconfigured 
 
 https://tailwindui.com/components?ref=sidebar
 
+# Color pallete
+
+http://adobe.ly/1iCGOjr

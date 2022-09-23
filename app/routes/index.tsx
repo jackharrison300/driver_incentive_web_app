@@ -4,33 +4,33 @@ import { useOptionalUser } from "~/utils";
 export default function LandingPage() {
     const user = useOptionalUser();
     return (
-    <main className="relative min-h-screen bg-t1-cream sm:flex sm:items-center sm:justify-center">
+    <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
       <div className="relative sm:pb-16 sm:pt-8">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden sm:rounded-2xl">
             <div className="absolute inset-0">
               <img
                 className="h-full w-full object-cover"
-                src="https://wallpaperaccess.com/full/1291276.jpg"
-                alt="Nirvana playing on stage with Kurt's jagstang guitar"
+                src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.wallpapertip.com%2Fwmimgs%2F174-1744848_sunbeam-truck-vehicle-volvo-wallpaper-volvo-truck-wallpaper.jpg&f=1&nofb=1&ipt=a5f16af4ce981d300a3654017e5248db6c507d6fa106e709d8a55b1ccf53e233&ipo=images"
+                alt="Truck image"
               />
-              <div className="absolute inset-0 bg-t1-lightgreen mix-blend-multiply" />
+              <div className="absolute inset-0 bg-t2-green bg-opacity-30 mix-blend-multiply" />
             </div>
-            <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-t1-bluegray bg-opacity-30">
-              <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-red-500 border-opacity-70 pb-4">
-                <p className="block uppercase text-white tracking-tight drop-shadow-lg">T25 WES</p>
+            <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-gradient-to-b from-t2-brown to-transparent">
+              <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-t2-red border-opacity-40 pb-4">
+                <span className="block uppercase text-t2-lightgreen tracking-tight drop-shadow-lg">T25 WES</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
-                <b><span className="text-t1-cream text-xl"><i>WE'S THE BEST</i></span></b>
-              </p>
-              <p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
-                Team 25 World Enterprise Solutions is the best solution for professional drivers on the road. We give you more ways to earn and spend your points. Register with your trucking company to start earning points today.
+              <div className ="mx-auto mt-6 max-w-lg text-center text-xl border-t2-brown border-2 border-opacity-40 sm:max-w-3xl bg-t2-lightgreen bg-opacity-70 rounded-md p-2">
+                <b><p className="text-center text-t2-darkgreen text-xl">WE'S THE BEST</p></b>
+                <p className="mx-auto mt-2 max-w-lg font-medium text-center text-lg text-t2-darkgreen sm:max-w-3xl">
+                  Team 25 World Enterprise Solutions is the best solution for professional drivers on the road. We give you more ways to earn and spend your points. Register with your trucking company to start earning points today.
                 </p>
+              </div>
               <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
                 {user ? (
                   <Link
                     to="/notes"
-                    className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-darkred shadow-sm hover:bg-red sm:px-8"
+                    className="flex items-center justify-center rounded-md border border-transparent bg-t2-lightgreen px-4 py-3 text-base font-medium text-t2-darkred shadow-sm hover:bg-t2-red sm:px-8"
                   >
                     View Notes for {user.email}
                   </Link>
@@ -38,13 +38,13 @@ export default function LandingPage() {
                   <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
                     <Link
                       to="/join"
-                      className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-red-500 shadow-sm hover:bg-red-50 hover:border-red-500 sm:px-8"
+                      className="flex items-center justify-center rounded-md border border-transparent bg-t2-lightgreen bg-opacity-80 px-4 py-3 text-base font-medium text-t2-red shadow-sm hover:border-t2-red hover:bg-opacity-100 sm:px-8"
                     >
                       Sign up
                     </Link>
                     <Link
                       to="/login"
-                      className="flex items-center justify-center rounded-md border border-transparent bg-red-500 px-4 py-3 font-medium text-white hover:bg-red-600 hover:border-red-100"
+                      className="flex items-center justify-center rounded-md border border-transparent bg-t2-red bg-opacity-80 px-4 py-3 font-medium text-t2-lightgreen hover:border-t2-lightgreen hover:bg-opacity-100"
                     >
                       Log In
                     </Link>

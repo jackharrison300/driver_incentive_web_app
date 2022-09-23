@@ -32,7 +32,13 @@ Sam is Serverless Application Model. It's what we will use to manage our infrast
 This way we can incrementally change our infrastructure in one place and manage our AWS resources pretty easily. It gives us the added benefit of restarting our entire deployment if things are messing up and we don't know why.
 
 # To deploy
-`sam deploy`
+- copy package.json and package-lock.json to ./layer/nodejs
+- In bash (WSL or Mac CLI), `npm install --omit=dev --prefix ./layer/nodejs` (for dependencies)
+- delete contents of ./server
+- `npm run build`
+- zip contents of layer (i.e. layer/nodejs) to layer/layer.zip
+- upload contents of public folder to s3 static bucket
+- `sam deploy`
 
 SAM also has functionality for local testing - `sam local invoke` but I do not think we will need to set that up
 for this project, as we can use remix with our local node environment for local testing.

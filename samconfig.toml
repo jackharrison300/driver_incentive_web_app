@@ -6,6 +6,6 @@ stack_name = "t25prod"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-13n55ugs28wd5"
 s3_prefix = "t25prod"
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 image_repositories = []

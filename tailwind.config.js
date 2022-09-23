@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors')
 
 module.exports = {
   content: ["./app/**/*.{ts,tsx,jsx,js}"],
@@ -12,6 +11,14 @@ module.exports = {
           lightgreen: '#AAD5AC',
           sand: '#EDEAC7',
           cream: '#EDF0DB',
+        },
+        t2: {
+          red: '#ee281b',
+          green: '#277b00',
+          darkgreen: '#172619',
+          lightgreen: '#e8ffdd',
+          darkred: '#610011',
+          brown: '#240000',
         },
       },
     },

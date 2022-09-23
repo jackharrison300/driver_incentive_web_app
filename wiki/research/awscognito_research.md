@@ -6,13 +6,60 @@ From the docs: Amazon Cognito provides authentication, authorization, and user m
 - https://blog.logrocket.com/implement-oauth-2-0-node-js/
 - https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html
 - https://www.stackery.io/blog/authentication-aws-cognito/
+- JWT decoding libs https://openid.net/developers/jwt/ 
+- JWT info https://www.rfc-editor.org/rfc/rfc7517
 
-## Jacob's Thoughts
+## Dynamic Link 
+ - Cognito hosted login UI w/ access code
+     - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
+ - Cognito hosted login UI w/ access token (probably only use this in dev for postman testing)
+     - https://t25.auth.us-east-1.amazoncognito.com/login?client_id=CLIENT_ID_GOES_HERE&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=URI_GOES_HERE
+ - Cognito user pool JWKS
+     - https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
 
-AWS Cognito would be a pretty good idea to manage our user groups. In our app, we have 3 main types of users, some with overlapping permissions. I've drawn out what I think a user should be able to do in a diagram in the Google Drive. Below is the version as of Sep 18. Feel free to change it / this document.
+# Cognito auth Flow
 
-![User roles.png](/.attachments/User%20roles-c645f6e1-972f-4df3-a8d4-cd15fac1c87c.png)
+### SAM start up reqs
 
-Basically what AWS Cognito is going to provide the user with their respective JWT tokens authorize their requests. All Lambda functions behind the AWS API Gateway can have this auth feature. I don't know how this will interact with the Remix routing and loading the front-end. This is a big todo.
+ - Create Cognito user pool for our entire application
+     - redirect to base app page
+ - Download and store the user pool public key JWKS
+ - Create an admin user group
+ - Create an unsponsored driver group
+ - Add a default admin login for start up
 
-For our first steps, we can flesh out our /api routes with Lambda code. This will be a great place to start working with Node.js as the Lambda functions themselves are loosely coupled from the code architecture.
+### User login
+ - Landing page w/ link to Cognito hosted ui
+ - Redirect to empty base app page
+ - Extract and verify token from redirect url parameter
+ - Verify token claims
+ - Populate base app page with data depending on cognito:groups
+    - For company "foo", there should be "foo_drivers" and "foo_sponsors" user groups created dynamically.
+
+### Authorizing server resources with JWT
+We will get the user pool from our JWT, with that string, we can authorize specific routes.
+
+Example of user group names:
+
+ - admin
+ - unsponsored_drivers
+ - foo_sponsors
+ - foo_drivers
+ - bar_sponsors
+ - bar_drivers
+ - baz_sponsors
+ - baz_drivers
+
+We can write a utility function to check our JWT for this user group name.
+
+### Adding a Company as an admin
+ - Login as admin
+ - Navigate to "Create a new Company"
+ - Fill in Company details
+      - company_name  // needs form validation
+      - Logo URL
+      - new Sponsor user
+           - username
+           - password
+ - Create the company_name_drivers and company_name_sponsors user groups
+ - Create a new dummy "proto" Sponsor account and add it to company_name_sponsors
