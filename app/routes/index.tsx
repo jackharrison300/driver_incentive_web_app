@@ -16,17 +16,15 @@ export default function LandingPage() {
               />
               <div className="absolute inset-0 bg-t1-lightgreen mix-blend-multiply" />
             </div>
-            <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-t1-bluegray bg-opacity-60">
-              <h1 className="text-center text-6xl font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
-                <span className="block uppercase text-white drop-shadow-lg bg-opacity-70 rounded-xl border-2 border-red-500 border-opacity-70 pb-4">
-                  T25 WES
-                </span>
+            <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-t1-bluegray bg-opacity-30">
+              <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-red-500 border-opacity-70 pb-4">
+                <p className="block uppercase text-white tracking-tight drop-shadow-lg">T25 WES</p>
               </h1>
               <p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
                 <b><span className="text-t1-cream text-xl"><i>WE'S THE BEST</i></span></b>
               </p>
               <p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
-                The best solution for professional drivers on the road. We give you more ways to earn and spend your points. Register with your trucking company to start earning points today.
+                Team 25 World Enterprise Solutions is the best solution for professional drivers on the road. We give you more ways to earn and spend your points. Register with your trucking company to start earning points today.
                 </p>
               <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
                 {user ? (
