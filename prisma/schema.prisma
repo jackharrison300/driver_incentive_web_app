@@ -44,6 +44,7 @@ model Company {
   catalogItems CatalogItem[]
   pointTypes PointType[]
   pointChanges PointChange[]
+  driverApplications DriverApplication[]
 
   @@index([isActive])
 }
@@ -102,10 +103,12 @@ model DriverApplication {
   driver Driver @relation(fields: [driverId], references: [userId])
   driverId Int
   applicationPdfUrl String
-  approver Sponsor @relation(fields: [approverId], references: [userId])
-  approverId Int
-  approvalDate DateTime
+  approver Sponsor? @relation(fields: [approverId], references: [userId])
+  approverId Int?
+  approvalDate DateTime?
   rejectionReason String? @db.Text
+  company Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   @@index([isActive])
 }

@@ -1,7 +1,85 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Exported by architect/package@8.1.5 on 2022-09-16T01:06:41.300Z
+
+Parameters:
+  ClientDomains:
+    Type: CommaDelimitedList
+    Description: Array of allowable domains for the t25users Cognito user pool
+  AdminEmail: 
+    Type: String
+    Description: Email address for proto-administrator
+
 Resources:
+  # Cognito
+  UserPool: 
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: t25users
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: t25client
+      GenerateSecret: false
+      RefreshTokenValidity: 30      # 30 day refresh on token
+      CallbackURLs: !Ref ClientDomains
+      LogoutURLs: !Ref ClientDomains
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: t25
+      UserPoolId: !Ref UserPool
+  AdminUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admins
+      Description: Admin user group
+      Precedence: 0 # the lower number has priority if a user belongs to many groups
+      UserPoolId: !Ref UserPool
+  UnsponsoredDriverGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: unsponsored_drivers
+      Description: Driver users that have not been approved yet
+      Precedence: 10
+      UserPoolId: !Ref UserPool
+  ProtoAdminUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: !Ref AdminEmail
+      DesiredDeliveryMediums:
+        - EMAIL
+      ForceAliasCreation: true
+      UserAttributes:
+        - Name: email
+          Value: !Ref AdminEmail
+      UserPoolId: !Ref UserPool
+  AttachProtoAdminUser:
+    Type: AWS::Cognito::UserPoolUserToGroupAttachment
+    Properties:
+      GroupName: admins
+      Username: !Ref AdminEmail
+      UserPoolId: !Ref UserPool  
+
+
   Role:
     Type: AWS::IAM::Role
     Properties:
@@ -51,58 +129,6 @@ Resources:
             Condition:
               StringEquals:
                 'secretsmanager:ResourceTag/team25': db
-  StaticBucketParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name:
-        Fn::Sub:
-        - /${AWS::StackName}/static/${key}
-        - key: bucket
-      Value:
-        Ref: StaticBucket
-  StaticFingerprintParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name:
-        Fn::Sub:
-        - /${AWS::StackName}/static/${key}
-        - key: fingerprint
-      Value: 'false'
-  ParameterStorePolicy:
-    Type: AWS::IAM::Policy
-    DependsOn: Role
-    Properties:
-      PolicyName: ArcParameterStorePolicy
-      PolicyDocument:
-        Statement:
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}
-            - {}
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*
-            - {}
-        - Effect: Allow
-          Action:
-          - ssm:GetParametersByPath
-          - ssm:GetParameter
-          Resource:
-            Fn::Sub:
-            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*/*
-            - {}
-      Roles:
-      - Ref: Role
   HTTP:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -135,13 +161,60 @@ Resources:
                       Ref: StaticBucket
                 connectionType: INTERNET
                 timeoutInMillis: 30000
+  # An rds instance has to sit in a VPC, and normally this is just
+  # your account's default VPC, but van scoy's account doesnt have a default vpc,
+  # so we gotta define our own. see below:
+  # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html
+  # https://stackoverflow.com/questions/34211843/is-it-possible-to-launch-an-rds-instance-without-a-vpc
+  Team25VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: 'true'
+      EnableDnsSupport: 'true'
+  Team25InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  Team25AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+         Ref: Team25VPC
+      InternetGatewayId:
+         Ref: Team25InternetGateway
+  Team25Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: Team25VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: "us-east-1a"
+    DependsOn: Team25VPC
+  Team25Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: Team25VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: "us-east-1b"
+    DependsOn: Team25VPC
+  Team25SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: 'Team 25 Subnet Group'
+      DBSubnetGroupName: Team25SubnetGroup
+      SubnetIds: 
+        - Ref: Team25Subnet1
+        - Ref: Team25Subnet2
+    DependsOn:
+    - Team25Subnet1
+    - Team25Subnet2
   DBSecret:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
-      Name: T25DBSecret
+      Name: Team25DBSecret
       Description: "DB secret with dynamically generated secret password."
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "t25user"}'
+        SecretStringTemplate: '{"username": "team25user"}'
         GenerateStringKey: "password"
         PasswordLength: 30
         ExcludeCharacters: '"@/\'
@@ -156,14 +229,28 @@ Resources:
       AllocatedStorage: '20'
       DBInstanceClass: db.t4g.micro
       Engine: mysql
-      MasterUsername: '{{resolve:secretsmanager:T25DBSecret:SecretString:username}}'
-      MasterUserPassword: '{{resolve:secretsmanager:T25DBSecret:SecretString:password}}'
-    DependsOn: DBSecret
+      MasterUsername: '{{resolve:secretsmanager:Team25DBSecret:SecretString:username}}'
+      MasterUserPassword: '{{resolve:secretsmanager:Team25DBSecret:SecretString:password}}'
+      PubliclyAccessible: true
+      DBSubnetGroupName: Team25SubnetGroup
+    DependsOn:
+    - DBSecret
+    - Team25SubnetGroup
+  Team25Layer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ./layer/layer.zip
+      CompatibleRuntimes:
+        - nodejs16.x
+    Metadata:
+      BuildMethod: nodejs16.x              # Required to have AWS SAM build this layer
   GetCatchallHTTPLambda:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       CodeUri: ./server
+      Layers:
+      - Ref: Team25Layer
       Runtime: nodejs16.x
       Architectures:
       - x86_64
@@ -177,15 +264,16 @@ Resources:
             Fn::Join:
             - ''
             - - 'mysql://'
-              - '{{resolve:secretsmanager:T25DBSecret:SecretString:username}}'
+              - '{{resolve:secretsmanager:Team25DBSecret:SecretString:username}}'
               - ':'
-              - '{{resolve:secretsmanager:T25DBSecret:SecretString:password}}'
+              - '{{resolve:secretsmanager:Team25DBSecret:SecretString:password}}'
               - '@'
               - !GetAtt MainRDSInstance.Endpoint.Address
               - ':'
               - !GetAtt MainRDSInstance.Endpoint.Port
               - '/'
               - 'Team25DB'
+          SESSION_SECRET: '6155bae57eabf011bc77db4b45f5293b'
           ARC_APP_NAME: app-default
           ARC_ENV: staging
           ARC_ROLE:
@@ -237,6 +325,17 @@ Resources:
                 Ref: StaticBucket
           Sid: PublicReadGetObject
 Outputs:
+  # Cognito
+  UserPoolId:
+    Description: "Cognito user pool ID"
+    Value: !Ref UserPool
+  UserPoolClientId:
+    Description: "Cognito user pool client ID"
+    Value: !Ref UserPoolClient
+  AuthUrl:
+    Description: "Cognito hosted ui url"
+    Value: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
+
   API:
     Description: API Gateway (HTTP)
     Value:
