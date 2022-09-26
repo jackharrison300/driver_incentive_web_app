@@ -31,6 +31,14 @@ enum PurchaseStatus {
   DELETED_FROM_CART
 }
 
+enum SsoProvider {
+  COGNITO_USER_POOL
+  LOGIN_WITH_AMAZON
+  GOOGLE
+  FACEBOOK
+  APPLE
+}
+
 model Company {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -55,14 +63,16 @@ model User {
   updatedAt DateTime @updatedAt
   isActive Boolean @default(true)
   email String @unique
-  firstName String
-  lastName String
+  name String
+  ssoProvider SsoProvider
+  ssoIdentifier String
   role Role
   driver Driver?
   sponsor Sponsor?
   admin Admin?
 
   @@index([isActive])
+  @@unique([ssoProvider, ssoIdentifier])
 }
 
 model Admin {
