@@ -2,6 +2,10 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
+{/* This will later be changed to pull from our db */}
+let imgsrc = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+let defaultimg ="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg"
+
 {/* display of the cart and # of contents */}
 const mycart = [
   { name: 'Cart: 12', current: false }
@@ -9,7 +13,7 @@ const mycart = [
 
 {/* will pull the contents for a name to be displayed */}
 const myname = [
-  { name: 'James Lee', current: false }
+  { name: 'James Cameron', current: false }
 ]
 
 {/* contains what will be displayed  in terms of points */}
@@ -48,7 +52,7 @@ export default function App() {
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
 
-                    {/* The left-side button and its dropdown menu */}
+                    {/* The left-side menu button and its dropdown menu */}
                     <Menu as="div" className="relative ml-3">
                       <div>
                         {/* The button */}
@@ -75,18 +79,20 @@ export default function App() {
                       >
                         {/* The dropdown menu */}
                         <Menu.Items className="absolute z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          for(let i = 0; i < 4; i++){
-                            <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="#"
-                                className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-12 text-sm text-gray-700')}
-                              >
-                                dropdownItems[i]
-                              </a>
-                            )}
-                          </Menu.Item>
-                          }
+                          {dropdownItems.map( (item) => {
+                            return(
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <a
+                                    href="#"
+                                    className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-5 text-sm text-gray-700')}
+                                  >
+                                    {item}
+                                  </a>
+                                )}
+                              </Menu.Item>
+                            );
+                          })}
                         </Menu.Items>
                       </Transition>
                     </Menu>
@@ -139,12 +145,18 @@ export default function App() {
                 ))}
 
                 {/* Your PFP */}
-                <img
-                  className="h-14 w-14 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-  
+                {imgsrc ?
+                  <img
+                    className="h-14 w-14 rounded-full"
+                    src={imgsrc}
+                    alt=""
+                  /> :
+                  <img 
+                    className="h-14 w-14 rounded-full"
+                    src={defaultimg}
+                    alt=""
+                  />
+                }
               </div>
             </div>
           </div>
