@@ -1,8 +1,24 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { useOptionalUser } from "~/utils";
 import type { LoaderFunction } from "@remix-run/node";
+import useDarkMode from './hooks/useDarkMode';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 type RequestContext = {domainName: string}
+
+const ThemeIcon = () => {
+  const [darkTheme, setDarkTheme] = useDarkMode();
+  const handleMode = () => setDarkTheme(!darkTheme);
+  return (
+    <span onClick={handleMode}>
+      {darkTheme ? (
+        <FaSun size='24' className='top-navigation-icon' />
+      ) : (
+        <FaMoon size='24' className='top-navigation-icon' />
+      )}
+    </span>
+  );
+};
 
 export const loader: LoaderFunction = async ({
   context
@@ -30,18 +46,20 @@ export default function LandingPage() {
     const { loginUrl, signupUrl } = useLoaderData();
 
     return (
-    <main className="relative min-h-screen bg-light sm:flex sm:items-center sm:justify-center">
-      <div className="relative sm:pb-16 sm:pt-8 border-dark border-2">
+    <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center
+                     bg-light text-dark dark:bg-dark dark:text-light">
+      <div className="relative sm:pb-16 sm:pt-8 border-2 border-lightgray dark:border-darkgray">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="relative shadow-xl sm:overflow-hidden">
-            <div className="absolute inset-0 border-dark border-2" />
+            <div className="absolute inset-0 border-2 border-lightgray dark:border-darkgray" />
             <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-gradient-to-b from-t2-brown to-transparent">
-              <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-dark pb-4 shadow-md shadow-primary">
-                <span className="block uppercase text-dark tracking-tight drop-shadow-lg">T25 WES</span>
+            <div className="p-4"><ThemeIcon /></div>
+              <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-lightgray dark:border-darkgray pb-4 shadow-xl">
+                <span className="block uppercase tracking-tight">T25 WES</span>
               </h1>
-              <div className ="mx-auto mt-6 max-w-lg text-center text-xl border-dark border-2 sm:max-w-3xl rounded-md p-2">
+              <div className ="mx-auto mt-6 max-w-lg text-center text-xl border-2 border-lightgray dark:border-darkgray sm:max-w-3xl rounded-md p-2">
                 <b><p className="text-center text-primary text-xl">WE'S THE BEST</p></b>
-                <p className="mx-auto mt-2 max-w-lg font-medium text-center text-lg text-dark sm:max-w-3xl">
+                <p className="mx-auto mt-2 max-w-lg font-medium text-center text-lg sm:max-w-3xl">
                   Team 25 World Enterprise Solutions is the best solution for professional drivers on the road. We give you more ways to earn and spend your points. Register with your trucking company to start earning points today.
                 </p>
               </div>
@@ -49,7 +67,7 @@ export default function LandingPage() {
                 {user ? (
                   <Link
                     to="/notes"
-                    className="flex items-center justify-center rounded-md border border-transparent bg-dark px-4 py-3 text-base font-medium text-dark shadow-sm sm:px-8"
+                    className="flex items-center justify-center rounded-md border border-transparent border-lightgray dark:border-darkgray px-4 py-3 text-base font-medium shadow-sm sm:px-8"
                   >
                     View Notes for {user.email}
                   </Link>
@@ -57,20 +75,21 @@ export default function LandingPage() {
                   <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
                     <a
                       href={signupUrl}
-                      className="flex items-center justify-center rounded-md border border-2 border-dark bg-light px-4 py-3 text-base font-medium text-dark shadow-sm hover:border-primary hover:bg-dark hover:text-light sm:px-8"
+                      className="flex items-center justify-center rounded-md sm:px-8 px-4 py-3 text-base font-medium shadow-sm
+                                 border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary"
                     >
                       Sign up
                     </a>
                     <a
                       href={loginUrl}
-                      className="flex items-center justify-center rounded-md border border-2 border-dark bg-light px-4 py-3 font-medium text-dark hover:border-primary hover:bg-dark hover:text-light"
+                      className="flex items-center justify-center rounded-md sm:px-8 px-4 py-3 text-base font-medium shadow-sm
+                                 border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary"
                     >
                       Log In
                     </a>
                   </div>
                 )}
               </div>
-              
             </div>
           </div>
         </div>
