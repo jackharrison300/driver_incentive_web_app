@@ -41,10 +41,10 @@ function classNames(...classes) {
 
 export default function App() {
   return (
-    <Disclosure as="nav" className="bg-gray-600">
+    <Disclosure as="nav" className="bg-light">
       {({ open }) => (
         <>
-          <div className="mx-auto max-w-7x1 px-2 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7x1 px-2 sm:px-6 lg:px-8 border border-dark">
             <div className="relative flex h-20 items-center justify-between">
 
               {/* This stuff is left aligned */}
