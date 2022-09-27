@@ -16,15 +16,18 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: t25users
+      AutoVerifiedAttributes:
+      - email
       Policies:
         PasswordPolicy:
           MinimumLength: 8
       UsernameAttributes:
         - email
       Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
+        - Name: email
+          Required: true
+        - Name: name
+          Required: true
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -37,16 +40,20 @@ Resources:
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthFlows:
         - code
-        - implicit
       AllowedOAuthScopes:
         - email
         - openid
         - profile
+      SupportedIdentityProviders:
+        - COGNITO
+    DependsOn:
+    - UserPool
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
       Domain: t25
       UserPoolId: !Ref UserPool
+    DependsOn: UserPool
   AdminUserGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
@@ -54,6 +61,7 @@ Resources:
       Description: Admin user group
       Precedence: 0 # the lower number has priority if a user belongs to many groups
       UserPoolId: !Ref UserPool
+    DependsOn: UserPool
   UnsponsoredDriverGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
@@ -61,6 +69,7 @@ Resources:
       Description: Driver users that have not been approved yet
       Precedence: 10
       UserPoolId: !Ref UserPool
+    DependsOn: UserPool
   ProtoAdminUser:
     Type: AWS::Cognito::UserPoolUser
     Properties:
@@ -72,13 +81,16 @@ Resources:
         - Name: email
           Value: !Ref AdminEmail
       UserPoolId: !Ref UserPool
+    DependsOn: UserPool
   AttachProtoAdminUser:
     Type: AWS::Cognito::UserPoolUserToGroupAttachment
     Properties:
       GroupName: admins
       Username: !Ref AdminEmail
-      UserPoolId: !Ref UserPool  
-
+      UserPoolId: !Ref UserPool
+    DependsOn:
+    - UserPool
+    - ProtoAdminUser
 
   Role:
     Type: AWS::IAM::Role
@@ -273,6 +285,8 @@ Resources:
               - !GetAtt MainRDSInstance.Endpoint.Port
               - '/'
               - 'Team25DB'
+          COGNITO_URL: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
+          COGNITO_CLIENT_ID: !Ref UserPoolClient
           SESSION_SECRET: '6155bae57eabf011bc77db4b45f5293b'
           ARC_APP_NAME: app-default
           ARC_ENV: staging
@@ -325,6 +339,13 @@ Resources:
                 Ref: StaticBucket
           Sid: PublicReadGetObject
 Outputs:
+  StaticBucket:
+    Description: Static S3 Bucket
+    Value:
+      Fn::Sub:
+      - s3://${bukkit}
+      - bukkit:
+          Ref: StaticBucket
   # Cognito
   UserPoolId:
     Description: "Cognito user pool ID"

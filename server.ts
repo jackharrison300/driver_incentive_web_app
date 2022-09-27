@@ -7,5 +7,8 @@ if (process.env.NODE_ENV !== "production") {
 
 export const handler = createRequestHandler({
   build,
+  getLoadContext(context) {
+    return {...context};
+  },
   mode: process.env.NODE_ENV,
 });
