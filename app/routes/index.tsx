@@ -1,8 +1,34 @@
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { useOptionalUser } from "~/utils";
+import type { LoaderFunction } from "@remix-run/node";
+
+type RequestContext = {domainName: string}
+
+export const loader: LoaderFunction = async ({
+  context
+}) => {
+  const isDevEnv = (process.env.NODE_ENV == "development");
+  const cognitoUrl = process.env.COGNITO_URL;
+  const cognitoClientId = process.env.COGNITO_CLIENT_ID;
+  // this will be e.g. "apiid.execute-api.us-east-1.amazonaws.com"
+  // we could use instead parameter store to store this rather than pull it from the event context,
+  // both seem reasonable approaches, though parameter store would have a slight performance cost.
+  // we could also make it an env variable, but we'd have to do it manually in the console every
+  // deployment, as doing it in same involves a circular dependency
+  const appUrl = isDevEnv ?
+    'http://localhost:3000' :
+    'https://' + (context.requestContext as RequestContext).domainName;
+  const querystring = 'client_id=' + cognitoClientId + '&response_type=code&scope=email+openid+profile&redirect_uri=' + appUrl;
+  return {
+    loginUrl: cognitoUrl + '/login?' + querystring,
+    signupUrl: cognitoUrl + '/signup?' + querystring,
+  };
+};
 
 export default function LandingPage() {
     const user = useOptionalUser();
+    const { loginUrl, signupUrl } = useLoaderData();
+
     return (
     <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
       <div className="relative sm:pb-16 sm:pt-8">
@@ -11,7 +37,7 @@ export default function LandingPage() {
             <div className="absolute inset-0">
               <img
                 className="h-full w-full object-cover"
-                src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.wallpapertip.com%2Fwmimgs%2F174-1744848_sunbeam-truck-vehicle-volvo-wallpaper-volvo-truck-wallpaper.jpg&f=1&nofb=1&ipt=a5f16af4ce981d300a3654017e5248db6c507d6fa106e709d8a55b1ccf53e233&ipo=images"
+                src="/_static/assets/truckimage.jpg"
                 alt="Truck image"
               />
               <div className="absolute inset-0 bg-t2-green bg-opacity-30 mix-blend-multiply" />
@@ -36,18 +62,18 @@ export default function LandingPage() {
                   </Link>
                 ) : (
                   <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
-                    <Link
-                      to="/join"
+                    <a
+                      href={signupUrl}
                       className="flex items-center justify-center rounded-md border border-transparent bg-t2-lightgreen bg-opacity-80 px-4 py-3 text-base font-medium text-t2-red shadow-sm hover:border-t2-red hover:bg-opacity-100 sm:px-8"
                     >
                       Sign up
-                    </Link>
-                    <Link
-                      to="/login"
+                    </a>
+                    <a
+                      href={loginUrl}
                       className="flex items-center justify-center rounded-md border border-transparent bg-t2-red bg-opacity-80 px-4 py-3 font-medium text-t2-lightgreen hover:border-t2-lightgreen hover:bg-opacity-100"
                     >
                       Log In
-                    </Link>
+                    </a>
                   </div>
                 )}
               </div>

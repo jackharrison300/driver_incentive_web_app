@@ -9,4 +9,4 @@ region = "us-east-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
-parameter_overrides = "ClientDomains=\"https://localhost:3000\" AdminEmail=\"jmcfady@g.clemson.edu\""
+parameter_overrides = "ClientDomains=\"http://localhost:3000\" AdminEmail=\"wharri8@g.clemson.edu\""
