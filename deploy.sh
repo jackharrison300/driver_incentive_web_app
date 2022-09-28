@@ -20,7 +20,10 @@ sam deploy
 cognito_client_id=$(aws cloudformation describe-stacks --query "Stacks[?StackName=='t25prod'][].Outputs[?OutputKey=='UserPoolClientId'].OutputValue" --output text)
 cognito_userpool_id=$(aws cloudformation describe-stacks --query "Stacks[?StackName=='t25prod'][].Outputs[?OutputKey=='UserPoolId'].OutputValue" --output text)
 api_url=$(aws cloudformation describe-stacks --query "Stacks[?StackName=='t25prod'][].Outputs[?OutputKey=='API'].OutputValue" --output text)
-aws cognito-idp update-user-pool-client --user-pool-id $cognito_userpool_id --client-id $cognito_client_id --callback-urls $api_url --logout-urls $api_url
+aws cognito-idp update-user-pool-client --user-pool-id $cognito_userpool_id --client-id $cognito_client_id \
+    --callback-urls $api_url http://localhost:3000 --logout-urls $api_url  http://localhost:3000 \
+    --supported-identity-providers COGNITO --allowed-o-auth-flows code \
+    --allowed-o-auth-scopes email openid profile --allowed-o-auth-flows-user-pool-client
 
 # s3 upload
 sbucket=$(aws cloudformation describe-stacks --query "Stacks[?StackName=='t25prod'][].Outputs[?OutputKey=='StaticBucket'].OutputValue" --output text)
