@@ -95,6 +95,7 @@ export default function Banner({ userInfo }: { userInfo: PersonalInfo | DriverIn
                   {userInfo.name}
                 </div>
 
+                {/* Your points, if you're a driver */}
                 { isDriver(userInfo) ? 
                   <div className="absolute inset-y-10 px-2 h-2 text-md font-medium text-black">
                     {'Points: ' + userInfo.points}
