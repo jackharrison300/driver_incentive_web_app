@@ -1,7 +1,7 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { useOptionalUser } from "~/utils";
 import type { LoaderFunction } from "@remix-run/node";
-import useDarkMode from './hooks/useDarkMode';
+import useDarkMode from '../components/hooks/useDarkMode';
 import { FaSun, FaMoon } from 'react-icons/fa';
 
 type RequestContext = {domainName: string}
