@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { PersonalInfo, DriverInfo } from '../../routes/app'
+import useDarkMode from '../hooks/useDarkMode'
+
 
 {/* Default pfp-less image */ }
 let defaultimg = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg"
@@ -26,12 +28,17 @@ function isDriver(userInfo: PersonalInfo | DriverInfo): userInfo is DriverInfo {
   return (userInfo as DriverInfo).points !== undefined
 }
 
+const ThemeIcon = () => {
+  const [darkTheme, setDarkTheme] = useDarkMode()
+  const handleMode = () => setDarkTheme(!darkTheme)
+}
+
 export default function Banner({ userInfo }: { userInfo: PersonalInfo | DriverInfo }) {
   return (
-    <Disclosure as="nav" className="bg-light">
+    <Disclosure as="nav" className="bg-light text-dark">
       {({ open }) => (
         <>
-          <div className="mx-auto border border-dark">
+          <div className="mx-auto border border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray">
             <div className="relative flex h-18 items-center justify-between">
 
               {/* This stuff is left aligned */}
