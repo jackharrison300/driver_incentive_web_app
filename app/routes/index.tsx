@@ -3,6 +3,8 @@ import { useOptionalUser } from "~/utils";
 import type { LoaderFunction } from "@remix-run/node";
 import useDarkMode from '../components/hooks/useDarkMode';
 import { FaSun, FaMoon } from 'react-icons/fa';
+import { useEffect } from "react";
+import useHandleCognitoCode from "../hooks/useHandleCognitoCode";
 
 type RequestContext = {domainName: string}
 
@@ -44,7 +46,7 @@ export const loader: LoaderFunction = async ({
 export default function LandingPage() {
     const user = useOptionalUser();
     const { loginUrl, signupUrl } = useLoaderData();
-
+    useHandleCognitoCode();
     return (
     <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center
                      bg-light text-dark dark:bg-dark dark:text-light">

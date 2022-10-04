@@ -1,4 +1,4 @@
-import { EnrollmentStatus, Role, User } from '@prisma/client';
+import { EnrollmentStatus, Role } from '@prisma/client';
 import { UserWithSponsorWithCompany, UserWithDriverWithCompany } from './shared_prisma';
 
 export class UserDto {

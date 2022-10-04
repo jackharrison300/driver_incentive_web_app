@@ -3,14 +3,14 @@ cp {package.json,package-lock.json,prisma/schema.prisma} layer/nodejs
 npm install --omit=dev --prefix layer/nodejs
 cd layer/nodejs
 npx prisma generate
-rm prisma.schema
+rm schema.prisma
 rm -R node_modules/prisma
 # the next three lines are a hack to cut down our layer size
 # cf. https://www.prisma.io/docs/guides/deployment/deployment-guides/caveats-when-deploying-to-aws-platforms#aws-lambda-upload-limit
 rm -R node_modules/@prisma/engines
 cd node_modules/.prisma/client
 rm $(ls libquery_engine* | grep -v libquery_engine-rhel-openssl-1.0.x.so.node)
-cd ../../..
+cd ../../../..
 rm layer.zip
 zip -r layer.zip nodejs
 cd ..
