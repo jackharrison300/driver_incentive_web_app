@@ -75,7 +75,7 @@ export default function Banner({ userInfo }: { userInfo: PersonalInfo | DriverIn
                         <Menu.Items className="absolute z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                           {dropdownItems.map((item) => {
                             return (
-                              <Menu.Item>
+                              <Menu.Item key={item}>
                                 {({ active }) => (
                                   <a
                                     href="#"

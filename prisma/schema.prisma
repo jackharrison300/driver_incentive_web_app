@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // rhel-openssl is the lambda platform
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+// }
 
 datasource db {
   provider = "mysql"
@@ -42,7 +44,7 @@ enum SsoProvider {
 model Company {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   name String @unique
   logoUrl String @unique
@@ -60,7 +62,7 @@ model Company {
 model User {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   email String @unique
   name String
@@ -78,13 +80,13 @@ model User {
 model Admin {
   user User @relation(fields: [userId], references: [id])
   userId Int @id
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 }
 
 model Sponsor {
   user User @relation(fields: [userId], references: [id])
   userId Int @id
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   company Company @relation(fields: [companyId], references: [id])
   companyId Int
   approvedDriverApplications DriverApplication[]
@@ -95,7 +97,7 @@ model Sponsor {
 model Driver {
   user User @relation(fields: [userId], references: [id])
   userId Int @id
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   company Company? @relation(fields: [companyId], references: [id])
   companyId Int?
   enrollmentStatus EnrollmentStatus
@@ -108,7 +110,7 @@ model Driver {
 model DriverApplication {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   driver Driver @relation(fields: [driverId], references: [userId])
   driverId Int
@@ -126,7 +128,7 @@ model DriverApplication {
 model PointChange {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   pointChangeCreator Sponsor @relation(fields: [pointChangeCreatorId], references: [userId])
   pointChangeCreatorId Int
@@ -150,7 +152,7 @@ model PointChange {
 model PointType {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   pointTypeName String
   pointTypeDescription String @db.Text
@@ -167,7 +169,7 @@ model PointType {
 model Vendor {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   vendorName String
   vendorDescription String @db.Text
@@ -182,7 +184,7 @@ model Vendor {
 model CatalogItem {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   vendorProductId String
   // intentionally not-normalized for simplicity of queries
@@ -198,7 +200,7 @@ model CatalogItem {
 model Purchase {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   isActive Boolean @default(true)
   catalogItem CatalogItem @relation(fields: [catalogItemId], references: [id])
   catalogItemId Int
@@ -213,7 +215,7 @@ model Purchase {
 model PasswordChange {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   passwordChangeDatetime DateTime
   email String
   isInitialCreation Boolean
@@ -222,7 +224,7 @@ model PasswordChange {
 model LoginAttempt {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
   passwordChangeDatetime DateTime
   email String
   wasSuccessful Boolean @default(false)

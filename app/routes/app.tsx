@@ -1,4 +1,5 @@
-import Banner from '../components/Banner/Banner'
+import Banner from '../components/Banner/Banner';
+import { Outlet } from "@remix-run/react";
 
 export interface PersonalInfo{
   name: String
@@ -21,5 +22,8 @@ const vinDiesel: DriverInfo={
 }
 
 export default function app() {
-  return( <Banner userInfo={ stevenWilde }/> )
+  return(<>
+    <Banner userInfo={ stevenWilde }/>
+    <Outlet />
+  </>)
 }

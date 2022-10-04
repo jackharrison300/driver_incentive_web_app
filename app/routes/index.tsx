@@ -27,10 +27,10 @@ export const loader: LoaderFunction = async ({
   const cognitoUrl = process.env.COGNITO_URL;
   const cognitoClientId = process.env.COGNITO_CLIENT_ID;
   // this will be e.g. "apiid.execute-api.us-east-1.amazonaws.com"
-  // we could use instead parameter store to store this rather than pull it from the event context,
+  // we could use parameter store to store this rather than pull it from the event context,
   // both seem reasonable approaches, though parameter store would have a slight performance cost.
   // we could also make it an env variable, but we'd have to do it manually in the console every
-  // deployment, as doing it in same involves a circular dependency
+  // deployment, as doing it in SAM involves a circular dependency
   const appUrl = isDevEnv ?
     'http://localhost:3000' :
     'https://' + (context.requestContext as RequestContext).domainName;
