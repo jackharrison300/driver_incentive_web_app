@@ -27,3 +27,5 @@ If the user wasn't properly authenticated / they will receive a 403 forbidden er
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
 
 If you see this error during development, double check your request to see if you are sending the token.
+
+This is an example JWT: d0928ce5-1708-454f-a66e-215201273b9e
