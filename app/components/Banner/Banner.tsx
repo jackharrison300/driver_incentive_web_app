@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { PersonalInfo, DriverInfo } from '../../routes/app'
+import { PersonalInfo, DriverInfo } from '../InfoPages/InfoPages'
 import useDarkMode from '../hooks/useDarkMode'
 
 
