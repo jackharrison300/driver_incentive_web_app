@@ -1,25 +1,29 @@
 import useDarkMode from '../components/hooks/useDarkMode';
 import {PersonalInfo} from '../components/InfoPages/InfoPages'
-import {useState} from 'react'
+import { User } from '@prisma/client';
+import { prisma } from '../../server';
+import { UserDto } from '../models/dto';
+import { LoaderFunction } from '@remix-run/server-runtime';
+import { useLoaderData } from '@remix-run/react';
 
-const myInfo: PersonalInfo={
-    // These will later be aquired with a db getter function component
-    name: "Leopold Jones",
-    pfp: "",
-    email: "oldyleopoldy@gmail.com",
-    phoneNumber: "555-555-5555"
+// pulling info from the DB based on email
+// TODO fix hardcoding
+export const loader: LoaderFunction = async ({
+}): Promise<UserDto> => {
+  // TODO AUTH
+  const myUser: User = (await prisma.user.findUnique({ where: { email: "ljbarro@clemson.edu" }}))!;
+  return new UserDto(myUser);
 }
 
 export default function profilePage() {
-    {/* Toggle switch to enable edit mode so you can input a new name, email, or phoone # */}
-    const [isEditMode, setEditMode] = useState(false)
+    const myData: UserDto = useLoaderData();
 
     return(
         <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
             {/* The left div */} 
             <div className="relative sm:pb-16 basis-2/12 h-screen  border-2 border-lightgray dark:border-darkgray">
                 <div className="py-2" />
-                <div className="mx-4 px-2 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"← Back"}
                     </a>
@@ -30,12 +34,12 @@ export default function profilePage() {
                 <div className="px-6 font-bold py-3 text-2xl">
                     {"User Settings"}
                 </div>
-                <div className="mx-4 px-2 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"Account"}
                     </a>
                 </div>
-                <div className="mx-4 px-2 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"Appearance"}
                     </a>
@@ -44,7 +48,7 @@ export default function profilePage() {
                 {/* The seperation bar */} 
                 <div className="border-2 mx-6 border-lightgray" />
                 <div className="py-2" />
-                <div className="mx-4 px-2 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"Log out"}
                     </a>
@@ -52,65 +56,37 @@ export default function profilePage() {
             </div>
             {/* The right div */} 
             <div className="relative basis-4/12 sm:pb-16 h-screen sm:pt-8 border-2 border-lightgray dark:border-darkgray">
-            <div className="px-6 font-bold py-1 text-2xl">
-                {"Account"}
-            </div>
-            <div className="py-2" />
-            <div className="px-6 font-bold">
-                <button onClick={() => setEditMode(!isEditMode)}>
-                    {"Edit"}
-                </button>
-            </div>
+                <div className="px-6 font-bold py-2 text-2xl">
+                    {"Account"}
+                </div>
                 {/* The box with acc. info */}
                 <div className="border-2 border:lightgray mx-6 my-2 shadow-xl">
                     <div className="py-2"/>
                     <div className="mx-4 px-2 font-bold py-1">
                         {"Name"}
                     </div>
-                    { isEditMode ? 
-                        <input className="mx-4 px-2 border-2 border-lightgray" type="text">
-                            {/* TODO fix taking inputs */}
-                            {/*var newName =  prompt(myInfo.name)*/}
-                        </input> :
-                        <div className="mx-4 px-2 font-bold py-1">
-                            {myInfo.name}
-                        </div>
-                    }
+                    <div className="mx-4 px-2 font-bold py-1">
+                        {myData.name}
+                    </div>
                     <div className="py-2" />
                     <div className="mx-4 px-2 font-bold py-1">
                         {"Email"}
                     </div>
-                    { isEditMode ? 
-                        <input className="mx-4 px-2 border-2 border-lightgray" type="text">
-                            {/* TODO fix taking inputs */}
-                            {/*var newEMail =  prompt(myInfo.email)*/}
-                        </input> :
-                        <div className="mx-4 px-2 font-bold py-1">
-                            {myInfo.email}
-                        </div>
-                    }
-                    <div className="py-2" />
+                    <button onClick={myData.email = prompt(myData.email) ?? myData.email}>
+                        {"Edit"}
+                    </button>
                     <div className="mx-4 px-2 font-bold py-1">
-                        {"Phone #"}
+                        {myData.email}
                     </div>
-                    { isEditMode ? 
-                        <input className="mx-4 px-2 border-2 border-lightgray" type="text">
-                            {/* TODO fix taking inputs */}
-                            {/*var newphoneNum =  prompt(myInfo.phoneNumber)*/}
-                        </input> :
-                        <div className="mx-4 px-2 font-bold py-1">
-                            {myInfo.phoneNumber}
-                        </div>
-                    }
-                    <div className="py-2" />
+                    <div className="py-3" />
                 </div>
                 <div className="py-2" />
-                <div className="mx-4 px-2 py-1 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 py-1 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"Update Name"}
                     </a>
                 </div>
-                <div className="mx-4 px-2 py-1 font-bold hover:border-2 hover:border-lightgray">
+                <div className="mx-4 px-2 py-1 font-bold border-2 border-transparent hover:border-lightgray">
                     <a href={"#"}>
                         {"Change Password"}
                     </a>
