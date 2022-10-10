@@ -9,12 +9,12 @@ const useHandleCognitoCode = () => {
         return
       }
 
-      const currURL = window.location.hostname
-      const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp" 
-      const cognitoURL = "https://t25.auth.us-east-1.amazoncognito.com" // TODO Parameter store
+      const currURL = window.location.hostname;
+      const cognitoClientId = process.env.COGNITO_CLIENT_ID;
+      const cognitoURL = process.env.COGNITO_URL;
 
       // get JWT from cognito
-      // FIXME this is broke
+      // This only works in prod, but localhost
       const authBodyParams = new URLSearchParams({
         grant_type: "authorization_code",
         code: currURLParams.get('code')?.toString(),
@@ -32,17 +32,17 @@ const useHandleCognitoCode = () => {
       const res = fetch(tokenURL, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
-        body: authBodyParams.toString()
+        body: authBodyParams
       }).then(
         res => {
-          console.log(res.body);
+          // store JWT
+          localStorage.setItem('id_token',res.id_token);
+          localStorage.setItem('access_token',res.access_token);
+          localStorage.setItem('refresh_token',res.refresh_token);
+          // redirect to /app
+          console.log('stored some cookies... 🍪🍪🍪')
         }
       )
-      // store JWT
-
-      // redirect to /app
-
-
     },[]);
 }
 export default useHandleCognitoCode;
