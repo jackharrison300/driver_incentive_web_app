@@ -1,4 +1,6 @@
 import Banner from '../components/Banner/Banner';
+import Sidebar from '../components/Sidebar/Sidebar';
+import Form from '../components/Form/Form';
 import { Outlet } from "@remix-run/react";
 
 export interface PersonalInfo{
@@ -22,8 +24,19 @@ const vinDiesel: DriverInfo={
 }
 
 export default function app() {
-  return(<>
-    <Banner userInfo={ stevenWilde }/>
-    <Outlet />
-  </>)
+
+  return(
+    <>
+      <Banner userInfo={ stevenWilde }/>
+      <div className="flex">
+        <div>
+          <Sidebar />
+        </div>
+        <div className="w-full">
+          <Form />
+        </div>
+      </div>
+      <Outlet />
+    </>
+  )
 }
