@@ -3,7 +3,7 @@ export default function Form(){
   return(
     <main className="sm:flex items-center justify-center text-center bg-light text-dark text-xl font-medium dark:bg-dark dark:text-light">
       <form>
-        <div className="max-w-xl p-8 sm:m-8 border-2 border-lightgray shadow-xl text-center grid grid-flow-row auto-rows-max">
+        <div className="max-w-3xl p-8 sm:m-8 border-2 border-lightgray shadow-xl text-center grid grid-flow-row auto-rows-max">
           <div className="pb-4 text-primary text-2xl font-bold border-b-2 mb-4">
             <header />Driver Application Form
           </div>

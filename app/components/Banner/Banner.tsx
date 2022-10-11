@@ -32,7 +32,7 @@ export default function Banner(
               <div className="px-1">
                 <div className="flex items-start justify-start">
                   <div className="inset-y-0 left-0 flex">
-                      <button className="text-xl mb-2 text-dark hover:text-primary" onClick={changeSidebarState}>
+                      <button className="text-4xl mb-2 text-dark hover:text-primary" onClick={changeSidebarState}>
                          ≡
                       </button>
                   </div>
