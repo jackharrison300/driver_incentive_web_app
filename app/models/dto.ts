@@ -44,3 +44,13 @@ export class DriverDto extends UserDto {
         });
     }
 }
+
+export class CompanyDto {
+    name: string;
+    logoUrl: string;
+
+    constructor(CompanyDto: Partial<CompanyDto>){
+        this.name = CompanyDto.name ?? '';
+        this.logoUrl = CompanyDto.logoUrl ?? '';
+    }
+}
