@@ -19,8 +19,7 @@ export const loader: LoaderFunction = async ({
   return new UserDto(myUser);
 }
 
-const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> =>{
-    const myData: UserDto = useLoaderData();
+export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> =>{
     const form = await request.formData();
     let [name, email] = [form.get('name'), form.get('email')]
     const errors: {name?: string, email?: string} = {}
@@ -31,22 +30,20 @@ const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Resp
     if(typeof email !== 'string' || containsHtml(email) || !email.includes('@'))
         errors.email = 'Invalid email'
 
+    const data: Partial<User> = {};
+
     // if a user leaves a form blank it will keep the same info as before
-    if(name == "") name = myData.name
-    if(email == "") email = myData.email
+    if(name !== "") data.name = name as string
+    if(email !== "") data.email = email as string
 
     //updating new info to prisma
-    const updateUser = prisma.user.update({
+    await prisma.user.update({
         where: {
             email: myEmail,
         },
-        data: {
-            name: (name as string),
-            email: (email as string)
-        }
+        data
     })
-
-    return redirect(name as string)
+    return new Response(null, {status: 200});
 }
 
 
@@ -105,7 +102,7 @@ export default function profilePage() {
                     <div className="py-2"/>
                     {updateMode ? 
                     // the form to get your new name and email
-                    <Form method="post" action="./profile">
+                    <Form method="post" onSubmit={() => toggleUpdateMode(!updateMode)}>
                         <label htmlFor="name" className="mx-4 px-2 font-bold py-1">{"Name"}</label><br/>
                         <input type="text" id="name" name="name" className="px-2 mx-4 py-1 border-2 rounded-md border-lightgray"></input><br/>
 
@@ -116,8 +113,13 @@ export default function profilePage() {
                         
                         <div className="py-2"/>
 
-                        <input type="submit" className="mx-4 px-2 font-bold py-1" onClick={() => toggleUpdateMode(!updateMode)}/>
-                    </Form>: 
+                        <button
+                            type='submit'
+                            className='inline-flex justify-center border px-4 py-2 text-sm text-center font-medium'
+                            >
+                            Submit
+                            </button>
+                    </Form> : 
                     // displaying your info within the box
                     <div>
                         <div className="mx-4 px-2 font-bold py-1">{"Name"}</div>
