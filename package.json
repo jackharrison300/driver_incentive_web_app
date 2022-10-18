@@ -28,6 +28,7 @@
   "dependencies": {
     "@architect/functions": "^5.2.1",
     "@headlessui/react": "^1.7.2",
+    "@heroicons/react": "^2.0.12",
     "@prisma/client": "^4.3.1",
     "@remix-run/architect": "^1.7.0",
     "@remix-run/node": "^1.7.0",

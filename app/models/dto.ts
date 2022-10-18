@@ -1,4 +1,4 @@
-import { EnrollmentStatus, Role } from '@prisma/client';
+import { Company, EnrollmentStatus, Role } from '@prisma/client';
 import { UserWithSponsorWithCompany, UserWithDriverWithCompany } from './shared_prisma';
 
 export class UserDto {
@@ -46,11 +46,20 @@ export class DriverDto extends UserDto {
 }
 
 export class CompanyDto {
+    id: number;
     name: string;
-    logoUrl: string;
+    pointDollarValue: string;
 
-    constructor(CompanyDto: Partial<CompanyDto>){
-        this.name = CompanyDto.name ?? '';
-        this.logoUrl = CompanyDto.logoUrl ?? '';
+    constructor(companyDto: Partial<CompanyDto>) {
+        this.id = companyDto.id ?? 0;
+        this.name = companyDto.name ?? '';
+        this.pointDollarValue = companyDto.pointDollarValue ?? '0.00';
+    }
+
+    static fromCompany(company: Company) {
+        return new CompanyDto({
+            ...company,
+            pointDollarValue: company.pointDollarValue.toFixed(2)
+        })
     }
 }

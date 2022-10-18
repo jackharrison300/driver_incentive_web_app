@@ -1,6 +1,8 @@
 import Banner from '../components/Banner/Banner';
+import Sidebar from '../components/Sidebar/Sidebar';
 import { Outlet } from "@remix-run/react";
 import {PersonalInfo, DriverInfo} from '../components/InfoPages/InfoPages'
+import { useState } from 'react';
 
 
 const stevenWilde: PersonalInfo={
@@ -19,8 +21,16 @@ const vinDiesel: DriverInfo={
 }
 
 export default function app() {
-  return(<>
-    <Banner userInfo={ stevenWilde }/>
-    <Outlet />
-  </>)
+  let [showSidebar, setShowSidebar] = useState(false);
+  return(
+    <>
+      <Banner userInfo={ stevenWilde } showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
+      <div className="flex">
+        {showSidebar && <Sidebar />}
+        <div className="w-full">
+          <Outlet />
+        </div>
+      </div>
+    </>
+  )
 }

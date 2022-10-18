@@ -325,7 +325,7 @@ Resources:
       MemorySize: 1152
       EphemeralStorage:
         Size: 512
-      Timeout: 5
+      Timeout: 20
       Environment:
         Variables:
           DATABASE_URL:
@@ -340,7 +340,8 @@ Resources:
               - ':'
               - !GetAtt MainRDSInstance.Endpoint.Port
               # connection limit should be max needed by code for concurrent queries
-              - '/Team25DB?connection_limit=3'
+              # max concurrent use is in dashboard.tsx loader
+              - '/Team25DB?connection_limit=4'
           COGNITO_URL: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
           COGNITO_CLIENT_ID:
             Ref: UserPoolClient
