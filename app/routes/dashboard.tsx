@@ -8,7 +8,6 @@ import { CompanyDto, DriverDto, SponsorDto, UserDto } from '../models/dto';
 import { UserWithDriverWithCompany, UserWithSponsorWithCompany } from '../models/shared_prisma';
 import { Dialog, Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
-import { PersonalInfo } from './app';
 
 type DashboardData = {adminDtos: UserDto[], sponsorDtos: SponsorDto[], driverDtos: DriverDto[], companyDtos: CompanyDto[]};
 
@@ -16,7 +15,7 @@ export const loader: LoaderFunction = async (): Promise<DashboardData> => {
   // TODO AUTH
 
   // doing the filter concurrently in-db seems simplest and likely fastest at low scale where a connection
-  // limit of 3 per lambda instance is doable. at high scale in which a connection limit of 1 may be required
+  // limit >= 3 per lambda instance is doable. at high scale in which a connection limit of 1 may be required
   // to not exhaust the db connection limit, this would be serialized instead of concurrent, in which case
   // it may be faster to pull the whole table in one query and filter using something like lodash's groupby()
   const [
@@ -41,7 +40,7 @@ export const loader: LoaderFunction = async (): Promise<DashboardData> => {
 export default function Dashboard() {
     const data: DashboardData = useLoaderData();
 
-    const userInfo: PersonalInfo={
+    const userInfo = {
       name: 'Steven Wilde',
       pfp: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
     }
