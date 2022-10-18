@@ -1,4 +1,3 @@
-import { HandThumbDownIcon } from '@heroicons/react/20/solid';
 import { Company, EnrollmentStatus, Role } from '@prisma/client';
 import { UserWithSponsorWithCompany, UserWithDriverWithCompany } from './shared_prisma';
 
@@ -49,18 +48,18 @@ export class DriverDto extends UserDto {
 export class CompanyDto {
     id: number;
     name: string;
-    pointDollarValue: number;
+    pointDollarValue: string;
 
     constructor(companyDto: Partial<CompanyDto>) {
         this.id = companyDto.id ?? 0;
         this.name = companyDto.name ?? '';
-        this.pointDollarValue = companyDto.pointDollarValue ?? 0;
+        this.pointDollarValue = companyDto.pointDollarValue ?? '0.00';
     }
 
     static fromCompany(company: Company) {
         return new CompanyDto({
             ...company,
-            pointDollarValue: company.pointDollarValue.toNumber()
+            pointDollarValue: company.pointDollarValue.toFixed(2)
         })
     }
 }

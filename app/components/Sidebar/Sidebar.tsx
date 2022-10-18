@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 export default function Sidebar(){
   return(
     <nav className="border-r-2 border-lightgray text-dark font-medium shadow-xl">

@@ -1,6 +1,5 @@
 import Banner from '../components/Banner/Banner';
 import Sidebar from '../components/Sidebar/Sidebar';
-import Form from '../components/Form/Form';
 import { Outlet } from "@remix-run/react";
 import { useState } from 'react';
 
@@ -30,14 +29,11 @@ export default function app() {
     <>
       <Banner userInfo={ stevenWilde } showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
       <div className="flex">
-        {showSidebar && <div>
-          <Sidebar />
-        </div>}
+        {showSidebar && <Sidebar />}
         <div className="w-full">
-          <Form />
+          <Outlet />
         </div>
       </div>
-      <Outlet />
     </>
   )
 }

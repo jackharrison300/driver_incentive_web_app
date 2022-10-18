@@ -325,7 +325,7 @@ Resources:
       MemorySize: 1152
       EphemeralStorage:
         Size: 512
-      Timeout: 5
+      Timeout: 20
       Environment:
         Variables:
           DATABASE_URL:
