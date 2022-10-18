@@ -10,6 +10,10 @@ There's an additional library which adds on to the react library, called [React 
 It also has a [tutorial](https://reactnative.dev/docs/getting-started), though there's not a finished product like with the other one. 
 If you decide to read the tutorial, be warned: it's somewhat long with many pages worth of content. Though the content is very helpful, such as [how to set up your environment](https://reactnative.dev/docs/environment-setup).
 
+Information that brings together some previous ideas, like React Native, to build forms with validation: https://react-hook-form.com/get-started/
+
+Formik and other react libraries for form validation should be interesting: https://www.kindacode.com/article/top-react-form-validation-libraries/
+
 ## Libraries we should use
 
 - React Query
