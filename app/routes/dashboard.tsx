@@ -2,7 +2,7 @@ import { useLoaderData, Form, useLocation } from '@remix-run/react';
 import { LoaderFunction } from '@remix-run/server-runtime';
 import { useTable, Column, TableOptions } from 'react-table';
 import React, { Fragment, useState } from 'react';
-import { User, Role, Company } from '@prisma/client';
+import { User, Role, Company, Sponsor } from '@prisma/client';
 import { prisma } from '../../server';
 import { CompanyDto, DriverDto, SponsorDto, UserDto } from '../models/dto';
 import { UserWithDriverWithCompany, UserWithSponsorWithCompany } from '../models/shared_prisma';
@@ -10,6 +10,8 @@ import { Dialog, Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 
 type DashboardData = {adminDtos: UserDto[], sponsorDtos: SponsorDto[], driverDtos: DriverDto[], companyDtos: CompanyDto[]};
+type DashboardUserDto = UserDto | SponsorDto | DriverDto;
+type DashboardDto = DashboardUserDto | CompanyDto;
 
 export const loader: LoaderFunction = async (): Promise<DashboardData> => {
   // TODO AUTH
@@ -57,6 +59,22 @@ export default function Dashboard() {
     const defaultView = roleDisplays.filter((rd) => rd.lowercaseName === React.useMemo(() => new URLSearchParams(search), [search]).get('view'))[0] ?? roleDisplays[0];
 
     const [selected, setSelected] = useState(defaultView);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [selectedEdit, setSelectedEdit] = useState<Partial<DashboardDto> | null>(null);
+
+    function openEditModal(rowDto: Partial<DashboardDto>) {
+      setSelectedEdit(rowDto);
+      setIsEditOpen(true);
+    }
+
+    function setSelectEditCompany() {
+      if (['Sponsor', 'Driver'].includes(selected.name)) {
+        const companyIdx: number = data.companyDtos.findIndex(co => co.name === (selectedEdit as SponsorDto | DriverDto)?.companyName);
+        const companyElement = document.getElementById('edit-user-company') as HTMLSelectElement;
+        companyElement.options[companyIdx].selected = true;
+      }
+    }
 
     const userColumns: Column[] = React.useMemo(() => [
         { Header: 'Name', accessor: 'name'},
@@ -102,13 +120,8 @@ export default function Dashboard() {
       prepareRow,
     } = useTable(getTableOptionsFromRoleName(selected.name));
 
-    const [isOpen, setIsOpen] = useState(false);
-
-    function openModal() {setIsOpen(true);}
-    function closeModal() {setIsOpen(false);}
-
+    // enforces clean form input for money
     function limitDecimalPlaces(e: any) {
-      console.log(e)
       if (['insertText', 'deleteContentBackward', 'deleteContentForward'].includes(e.nativeEvent.inputType)) {
         const dotIdx = e.target.value.indexOf('.');
         if (dotIdx !== -1 || (e.target.value.length - dotIdx) > 3) {
@@ -122,15 +135,15 @@ export default function Dashboard() {
 
     return (
       <>
-      <nav className="bg-light text-dark text-xl font-medium">
-        <div className="mx-auto border-b-2 border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray">
-          <div className="relative flex h-18 items-center justify-between">
+      <nav className='bg-light text-dark text-xl font-medium'>
+        <div className='mx-auto border-b-2 border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray'>
+          <div className='relative flex h-18 items-center justify-between'>
 
             {/* This stuff is left aligned -- to be replaced with link to reports*/}
-            <div className="px-1">
-              <div className="flex items-start justify-start">
-                <div className="inset-y-0 left-0 flex">
-                    <button className="text-4xl mb-2 text-dark hover:text-primary">
+            <div className='px-1'>
+              <div className='flex items-start justify-start'>
+                <div className='inset-y-0 left-0 flex'>
+                    <button className='text-4xl mb-2 text-dark hover:text-primary'>
                         ≡
                     </button>
                 </div>
@@ -138,10 +151,10 @@ export default function Dashboard() {
             </div>
 
             {/* This stuff is right aligned */}
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div className='absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'>
 
               {/* Your name */}
-              <div className="inset-y-0 px-2"> 
+              <div className='inset-y-0 px-2'> 
                 {userInfo.name}
               </div>
             </div>
@@ -201,7 +214,7 @@ export default function Dashboard() {
           </Listbox>
             <button
               type='button'
-              onClick={openModal}
+              onClick={() => setIsCreateOpen(true)}
               className='relative border-2 ml-2 w-44 bg-light p-2 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-light focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-dark'
             >
               Create new {selected.lowercaseName}
@@ -215,6 +228,8 @@ export default function Dashboard() {
                       {column.render('Header')}
                     </th>
                   ))}
+                  {/* empty header cell for edit column */}
+                  <th className='border-2 p-2 font-bold w-14'></th>
                 </tr>
               ))}
             </thead>
@@ -233,6 +248,12 @@ export default function Dashboard() {
                         </td>
                       )
                     })}
+                    {/* extra cell for edit button */}
+                    <td className='border-2 p-2'>
+                      <button onClick={() => {openEditModal(row.values as Partial<DashboardDto>)}}>
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 )
               })}
@@ -240,8 +261,9 @@ export default function Dashboard() {
           </table>
         </div>
       </div>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as='div'className='relative z-10'onClose={closeModal}>
+      {/* create modal */}
+      <Transition appear show={isCreateOpen} as={Fragment}>
+        <Dialog as='div'className='relative z-10'onClose={() => setIsCreateOpen(false)}>
           <Transition.Child
               as={Fragment}
               enter='ease-out duration-300'
@@ -254,93 +276,202 @@ export default function Dashboard() {
             <div className='fixed inset-0 bg-dark bg-opacity-75'/>
           </Transition.Child>
           <div className='fixed inset-0 overflow-y-auto'>
-            <div className='flex min-h-full items-center justify-center p-4 text-center'>
-              <Transition.Child
-                as={Fragment}
-                enter='ease-out duration-300'
-                enterFrom='opacity-0 scale-95'
-                enterTo='opacity-100 scale-100'
-                leave='ease-in duration-200'
-                leaveFrom='opacity-100 scale-100'
-                leaveTo='opacity-0 scale-95'
-              >
-                <Dialog.Panel className='w-full max-w-md transform overflow-hidden bg-light p-6 text-left align-middle shadow-xl transition-all border-2'>
-                  <Dialog.Title
-                    as='h3'
-                    className='text-center text-lg font-medium leading-6'
-                  >
-                    New {selected.name}
-                  </Dialog.Title>
-                  <div className='mt-2'>
-                  <Form method='post' action={'/api/create-' + selected.lowercaseName} onSubmit={closeModal} className='w-full max-w-lg'>
-                    {['Sponsor', 'Driver', 'Admin'].includes(selected.name) &&
-                    <div className='flex flex-wrap -mx-3 mb-2'>
-                      <div className='w-full md:w-1/2 px-3'>
-                        <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-first-name'>
-                          Name
-                        </label>
-                        <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='grid-first-name' type='text' placeholder='John Doe' required/>
-                      </div>
-                      <div className='w-full md:w-1/2 px-3'>
-                        <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-last-name'>
-                          Email
-                        </label>
-                        <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='email' id='grid-last-name' type='text' placeholder='johndoe@gmail.com' required/>
-                      </div>
+          <div className='flex min-h-full items-center justify-center p-4 text-center'>
+            <Transition.Child
+              as={Fragment}
+              enter='ease-out duration-300'
+              enterFrom='opacity-0 scale-95'
+              enterTo='opacity-100 scale-100'
+              leave='ease-in duration-200'
+              leaveFrom='opacity-100 scale-100'
+              leaveTo='opacity-0 scale-95'
+            >
+              <Dialog.Panel className='w-full max-w-md transform overflow-hidden bg-light p-6 text-left align-middle shadow-xl transition-all border-2'>
+                <Dialog.Title
+                  as='h3'
+                  className='text-center text-lg font-medium leading-6'
+                >
+                  New {selected.name}
+                </Dialog.Title>
+                <div className='mt-2'>
+                <Form method='post' action={'/api/create-' + selected.lowercaseName} onSubmit={() => setIsCreateOpen(false)} className='w-full max-w-lg'>
+                  {['Sponsor', 'Driver', 'Admin'].includes(selected.name) &&
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-first-name'>
+                        Name
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='grid-first-name' type='text' placeholder='John Doe' required/>
                     </div>
-                    }
-                    {['Sponsor', 'Driver'].includes(selected.name) &&
-                    <div className='flex flex-wrap -mx-3 mb-2'>
-                      <div className='w-full px-3'>
-                        <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-state'>
-                          Company
-                        </label>
-                        <div className='relative'>
-                          <select className='block appearance-none w-full bg-gray-200 border border-lightgray text-gray-700 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-light focus:border-lightgray' name='companyId' id='grid-state' required>
-                            {data.companyDtos.map((company) =>
-                              <option key={company.id} value={company.id.toString()}>{company.name}</option>
-                            )}
-                          </select>
-                          <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
-                            <ChevronDownIcon className='h-5 w-5 text-gray-400' aria-hidden='true'/>
-                          </div>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-last-name'>
+                        Email
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='email' id='grid-last-name' type='text' placeholder='johndoe@gmail.com' required/>
+                    </div>
+                  </div>
+                  }
+                  {['Sponsor', 'Driver'].includes(selected.name) &&
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-state'>
+                        Company
+                      </label>
+                      <div className='relative'>
+                        <select className='block appearance-none w-full bg-gray-200 border border-lightgray text-gray-700 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-light focus:border-lightgray' name='companyId' id='grid-state' required>
+                          {data.companyDtos.map((company) =>
+                            <option key={company.id} value={company.id.toString()}>{company.name}</option>
+                          )}
+                        </select>
+                        <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
+                          <ChevronDownIcon className='h-5 w-5 text-gray-400' aria-hidden='true'/>
                         </div>
                       </div>
                     </div>
-                    }
-                    {'Company' === selected.name &&
-                    <div className='flex flex-wrap -mx-3 mb-2'>
-                      <div className='w-full md:w-1/2 px-3'>
-                        <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-first-name'>
-                          Name
-                        </label>
-                        <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='grid-first-name' type='text' placeholder='Acme, Inc.' required/>
-                      </div>
-                      <div className='w-full md:w-1/2 px-3'>
-                        <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-last-name'>
-                          Point Value ($)
-                        </label>
-                        <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='pointDollarValue' id='grid-last-name' type='number' defaultValue='1.00' step='0.01' onInput={limitDecimalPlaces} required/>
+                  </div>
+                  }
+                  {'Company' === selected.name &&
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-first-name'>
+                        Name
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='grid-first-name' type='text' placeholder='Acme, Inc.' required/>
+                    </div>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-last-name'>
+                        Point Value ($)
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='pointDollarValue' id='grid-last-name' type='number' defaultValue='1.00' step='0.01' onInput={limitDecimalPlaces} required/>
+                    </div>
+                  </div>
+                  }
+                  <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>
+                <div className='mt-4 flex justify-center'>
+                  <button
+                    type='submit'
+                    className='inline-flex justify-center border px-4 py-2 text-sm text-center font-medium'
+                  >
+                    Submit
+                  </button>
+                </div>
+              </Form>
+            </div>
+            </Dialog.Panel>
+          </Transition.Child>
+          </div>
+          </div>
+        </Dialog>
+      </Transition>
+      {/* edit modal */}
+      <Transition appear show={isEditOpen} as={Fragment}>
+        <Dialog as='div'className='relative z-10' onClose={() => setIsEditOpen(false)}>
+          <Transition.Child
+              as={Fragment}
+              enter='ease-out duration-300'
+              enterFrom='opacity-0'
+              enterTo='opacity-100'
+              leave='ease-in duration-200'
+              leaveFrom='opacity-100'
+              leaveTo='opacity-0'
+          >
+            <div className='fixed inset-0 bg-dark bg-opacity-75'/>
+          </Transition.Child>
+          <div className='fixed inset-0 overflow-y-auto'>
+          <div className='flex min-h-full items-center justify-center p-4 text-center'>
+            <Transition.Child
+              as={Fragment}
+              enter='ease-out duration-300'
+              enterFrom='opacity-0 scale-95'
+              enterTo='opacity-100 scale-100'
+              leave='ease-in duration-200'
+              leaveFrom='opacity-100 scale-100'
+              leaveTo='opacity-0 scale-95'
+              beforeEnter={setSelectEditCompany}
+            >
+              <Dialog.Panel className='w-full max-w-md transform overflow-hidden bg-light p-6 text-left align-middle shadow-xl transition-all border-2'>
+                <Dialog.Title
+                  as='h3'
+                  className='text-center text-lg font-medium leading-6'
+                >
+                  Edit {selected.name}
+                </Dialog.Title>
+                <div className='mt-2'>
+                <Form method='post' action={'/api/edit-' + selected.lowercaseName} onSubmit={() => setIsEditOpen(false)} className='w-full max-w-lg'>
+                  {['Sponsor', 'Driver', 'Admin'].includes(selected.name) &&
+                  <>
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-name'>
+                        Name
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='edit-name' type='text' defaultValue={selectedEdit?.name} required/>
+                    </div>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-email'>
+                        Email
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='email' id='edit-email' type='text' defaultValue={(selectedEdit as DashboardUserDto | null)?.email} required/>
+                    </div>
+                  </div>
+                  <input type='hidden' name='originalEmail' value={(selectedEdit as DashboardUserDto | null)?.email}/>
+                  </>
+                  }
+                  {['Sponsor', 'Driver'].includes(selected.name) &&
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-user-company'>
+                        Company
+                      </label>
+                      <div className='relative'>
+                        <select className='block appearance-none w-full bg-gray-200 border border-lightgray text-gray-700 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-light focus:border-lightgray' name='companyId' id='edit-user-company' required>
+                          {data.companyDtos.map((company) =>
+                            <option key={company.id} value={company.id.toString()}>{company.name}</option>
+                          )}
+                        </select>
+                        <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
+                          <ChevronDownIcon className='h-5 w-5 text-gray-400' aria-hidden='true'/>
+                        </div>
                       </div>
                     </div>
-                    }
-                    <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>
-                  <div className='mt-4 flex justify-center'>
-                    <button
-                      type='submit'
-                      className='inline-flex justify-center border px-4 py-2 text-sm text-center font-medium'
-                    >
-                      Submit
-                    </button>
                   </div>
-                </Form>
-              </div>
-              </Dialog.Panel>
-            </Transition.Child>
+                  }
+                  {'Company' === selected.name &&
+                  <>
+                  <div className='flex flex-wrap -mx-3 mb-2'>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-company-name'>
+                        Name
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='edit-company-name' type='text' defaultValue={selectedEdit?.name} required/>
+                    </div>
+                    <div className='w-full md:w-1/2 px-3'>
+                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-point-value'>
+                        Point Value ($)
+                      </label>
+                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='pointDollarValue' id='edit-point-value' type='number' defaultValue={(selectedEdit as CompanyDto)?.pointDollarValue} step='0.01' onInput={limitDecimalPlaces} required/>
+                    </div>
+                  </div>
+                  <input type='hidden' name='originalName' value={(selectedEdit as CompanyDto | null)?.name}/>
+                  </>
+                  }
+                  <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>
+                <div className='mt-4 flex justify-center'>
+                  <button
+                    type='submit'
+                    className='inline-flex justify-center border px-4 py-2 text-sm text-center font-medium'
+                  >
+                    Submit
+                  </button>
+                </div>
+              </Form>
             </div>
-            </div>
-          </Dialog>
-        </Transition>
+            </Dialog.Panel>
+          </Transition.Child>
+          </div>
+          </div>
+        </Dialog>
+      </Transition>
       </>
     )
 }

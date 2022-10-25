@@ -8,7 +8,9 @@ if (process.env.NODE_ENV !== "production") {
 
 // initialize outside of handler
 // cf. https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#prismaclient-in-serverless-environments
-export const prisma = new PrismaClient();
+export const prisma = new PrismaClient({
+  log: ['query'],
+});
 
 export const handler = createRequestHandler({
   build,
