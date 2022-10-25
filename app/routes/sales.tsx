@@ -10,7 +10,7 @@ const loader: LoaderFunction = async ({
   // TODO fix hardcoding
   // TODO remove the ! and handle a possible null
     const myCompany: Company = (await prisma.company.findUnique({ where: { name: "Test Company" }}))!;
-    return new CompanyDto(myCompany)
+    return CompanyDto.fromCompany(myCompany)
 }
 
 const placeholderImage = "https://media.istockphoto.com/vectors/thumbnail-image-vector-graphic-vector-id1147544807?k=20&m=1147544807&s=612x612&w=0&h=pBhz1dkwsCMq37Udtp9sfxbjaMl27JUapoyYpQm0anc="

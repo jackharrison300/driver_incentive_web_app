@@ -8,14 +8,14 @@ import { useState } from 'react';
 import { containsHtml } from '../shared_functions';
 import { Form } from '@remix-run/react';
 
-let myEmail = "ljbarro@clemson.edu"
+let myId = 1
 
 // pulling info from the DB based on email
 export const loader: LoaderFunction = async ({
 }): Promise<UserDto> => {
   // TODO AUTH
   // TODO fix hardcoding
-  const myUser: User = (await prisma.user.findUnique({ where: { email: myEmail }}))!;
+  const myUser: User = (await prisma.user.findUnique({ where: { id: myId }}))!;
   return new UserDto(myUser);
 }
 
@@ -39,25 +39,33 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
     //updating new info to prisma
     await prisma.user.update({
         where: {
-            email: myEmail,
+            id: myId,
         },
         data
     })
-    return new Response(null, {status: 200});
+    return new Response(null, {status: 200})
 }
 
 
 export default function profilePage() {
-    const myData: UserDto = useLoaderData();
-    const [updateMode, toggleUpdateMode] = useState(false);
+    const myData: UserDto = useLoaderData()
+    const [updateMode, toggleUpdateMode] = useState(false)
+    const [isHovering, setIsHovering] = useState(false)
 
+    const handleMouseOver = () => {
+        setIsHovering(true)
+    }
+
+    const handleMouseOut = () => {
+        setIsHovering(false)
+    }
     return(
         <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
             
             {/* The left div */} 
             <div className="relative sm:pb-16 basis-2/12 h-screen  border-2 border-lightgray dark:border-darkgray">
                 <div className="py-2" />
-                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
                     <a href={"#"}>
                         {"← Back"}
                     </a>
@@ -70,12 +78,12 @@ export default function profilePage() {
                 <div className="px-6 font-bold py-3 text-2xl">
                     {"User Settings"}
                 </div>
-                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
                     <a href={"#"}>
                         {"Account"}
                     </a>
                 </div>
-                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
                     <a href={"#"}>
                         {"Appearance"}
                     </a>
@@ -86,7 +94,7 @@ export default function profilePage() {
                 <div className="border-2 mx-6 border-lightgray" />
                 <div className="py-2" />
 
-                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray">
+                <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
                     <a href={"#"}>
                         {"Log out"}
                     </a>
@@ -98,27 +106,30 @@ export default function profilePage() {
                 <div className="px-6 font-bold py-2 text-2xl">{"Account"}</div>
 
                 {/* The box in the right div */}
-                <div className="border-2 border:lightgray mx-6 my-2 shadow-xl">
+                <div className="border-2 border:lightgray mx-5 my-2 shadow-xl">
                     <div className="py-2"/>
                     {updateMode ? 
                     // the form to get your new name and email
-                    <Form method="post" onSubmit={() => toggleUpdateMode(!updateMode)}>
+                    <Form method="post" onSubmit={() => {
+                        toggleUpdateMode(!updateMode)
+                        setTimeout(function () { window.location.reload(); }, 500)
+                    }}>
                         <label htmlFor="name" className="mx-4 px-2 font-bold py-1">{"Name"}</label><br/>
-                        <input type="text" id="name" name="name" className="px-2 mx-4 py-1 border-2 rounded-md border-lightgray"></input><br/>
+                        <input type="text" id="name" name="name" className="px-2 mx-4 py-1 border-2 rounded-md border-lightgray shadow-lg"></input><br/>
 
                         <div className="py-2" />
                         
-                        <label htmlFor="email" className="mx-4 px-2 font-bold py-1">{"email"}</label><br/>
-                        <input type="text" id="email" name="email" className="px-2 mx-4 py-1 border-2 rounded-md border-lightgray"></input><br/>
+                        <label htmlFor="email" className="mx-4 px-2 font-bold py-1">{"Email"}</label><br/>
+                        <input type="text" id="email" name="email" className="px-2 mx-4 py-1 border-2 rounded-md border-lightgray shadow-lg"></input><br/>
                         
                         <div className="py-2"/>
 
                         <button
                             type='submit'
-                            className='inline-flex justify-center border px-4 py-2 text-sm text-center font-medium'
-                            >
-                            Submit
-                            </button>
+                            className='inline-flex justify-center border px-4 m-4 py-2 text-sm text-center font-medium shadow-lg'
+                        >
+                            {"Submit"}
+                        </button>
                     </Form> : 
                     // displaying your info within the box
                     <div>
@@ -138,17 +149,34 @@ export default function profilePage() {
                 <div className="py-2" />
 
                 {/* Options to change your name, email or password. sits under the box displaying your info */}
-                <div className="mx-4 px-2 py-1 font-bold text-lg">
-                    <button onClick={() => toggleUpdateMode(!updateMode)}>
-                        {"Change Name and Email"}
-                    </button>
+                <div>
+                    {updateMode ? 
+                        <></> :
+                        <button 
+                            onClick={() => toggleUpdateMode(!updateMode)}
+                            className="mx-4 px-2 py-1 font-bold text-lg border-2 border-transparent hover:border-lightgray hover:shadow-lg"
+                        >
+                            {"Change Name and Email"}
+                        </button> 
+                    }
                 </div>
-                <div className="mx-4 px-2 py-3 w-48 text-sm italic text-transparent hover:text-black">
-                    <a href={"#"} className="font-bold not-italic text-black text-lg">
-                        {"Change Password"}
-                    </a><br/>
-                    {"This will send you an email to reset your password"}
-                </div>
+                <div className="py-1"/>
+                {/* this will always appear */}
+                <a 
+                    onMouseOver={handleMouseOver} 
+                    onMouseOut={handleMouseOut}
+                    href={"#"} 
+                    className="mx-4 px-2 py-1 font-bold not-italic text-black text-lg border-2 border-transparent hover:border-lightgray hover:shadow-lg"
+                >
+                    {"Change Password"}
+                </a><br/>
+                {/* this will appear when the anchor above is hovered over */}
+                {isHovering ?
+                    <div className="mx-4 py-3 w-48 text-sm italic">
+                        {"This will send you an email to reset your password"}
+                    </div>:
+                    <></>
+                }
             </div>
         </main>
     )
