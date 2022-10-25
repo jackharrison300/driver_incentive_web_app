@@ -48,12 +48,12 @@ export class DriverDto extends UserDto {
 export class CompanyDto {
     id: number;
     name: string;
-    pointDollarValue: number;
+    pointDollarValue: string;
 
     constructor(companyDto: Partial<CompanyDto>) {
         this.id = companyDto.id ?? 0;
         this.name = companyDto.name ?? '';
-        this.pointDollarValue = companyDto.pointDollarValue ?? 0;
+        this.pointDollarValue = companyDto.pointDollarValue ?? "0";
     }
 
     static fromCompany(company: Company) {
@@ -65,7 +65,7 @@ export class CompanyDto {
 }
 
 export class PurchaseDto {
-    //createdAt: Date
+    createdAt: Date
     catalogItem: string
     catalogItemId: number
     purchaseStatus: string
@@ -73,7 +73,7 @@ export class PurchaseDto {
     cashvalue: number
 
     constructor(purchaseDto: Partial<PurchaseDto>){
-        //this.createdAt = purchaseDto.createdAt ?? undefined
+        this.createdAt = purchaseDto.createdAt!
         this.catalogItem = purchaseDto.catalogItem ?? ''
         this.catalogItemId = purchaseDto.catalogItemId ?? 0
         this.purchaseStatus = purchaseDto.purchaseStatus ?? ''
