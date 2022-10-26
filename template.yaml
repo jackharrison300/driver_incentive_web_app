@@ -365,7 +365,7 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /{proxy+}
-            Method: GET
+            Method: ANY
             ApiId:
               Ref: HTTP
     DependsOn: DBSecret
