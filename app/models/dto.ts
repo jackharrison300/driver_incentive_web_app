@@ -53,7 +53,7 @@ export class CompanyDto {
     constructor(companyDto: Partial<CompanyDto>) {
         this.id = companyDto.id ?? 0;
         this.name = companyDto.name ?? '';
-        this.pointDollarValue = companyDto.pointDollarValue ?? '0.00';
+        this.pointDollarValue = companyDto.pointDollarValue ?? "0";
     }
 
     static fromCompany(company: Company) {
@@ -61,5 +61,23 @@ export class CompanyDto {
             ...company,
             pointDollarValue: company.pointDollarValue.toFixed(2)
         })
+    }
+}
+
+export class PurchaseDto {
+    createdAt: Date
+    catalogItem: string
+    catalogItemId: number
+    purchaseStatus: string
+    driver: string
+    cashvalue: number
+
+    constructor(purchaseDto: Partial<PurchaseDto>){
+        this.createdAt = purchaseDto.createdAt!
+        this.catalogItem = purchaseDto.catalogItem ?? ''
+        this.catalogItemId = purchaseDto.catalogItemId ?? 0
+        this.purchaseStatus = purchaseDto.purchaseStatus ?? ''
+        this.driver = purchaseDto.driver ?? ''
+        this.cashvalue = purchaseDto.cashvalue ?? 0
     }
 }

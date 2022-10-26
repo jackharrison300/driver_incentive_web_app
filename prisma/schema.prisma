@@ -208,6 +208,7 @@ model Purchase {
   driver Driver @relation(fields: [driverId], references: [userId])
   driverId Int
   pointChange PointChange?
+  CashValue Decimal
 
   @@index([isActive])
 }
