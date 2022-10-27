@@ -38,13 +38,15 @@
     "aws-jwt-verify": "^3.1.0",
     "bcryptjs": "2.4.3",
     "cuid": "^2.1.8",
+    "formik": "^2.2.9",
     "isbot": "^3.5.2",
     "prisma": "^4.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
     "react-table": "^7.8.0",
-    "tiny-invariant": "^1.2.0"
+    "tiny-invariant": "^1.2.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@architect/architect": "^10.7.1",
