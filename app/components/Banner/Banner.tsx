@@ -2,7 +2,22 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { PersonalInfo, DriverInfo } from '../InfoPages/InfoPages'
 import useDarkMode from '../hooks/useDarkMode'
+import { LoaderFunction } from '@remix-run/server-runtime'
+import { UserDto } from '~/models/dto'
+import { prisma } from 'server'
+import { User } from '@prisma/client'
+import { useLoaderData } from '@remix-run/react'
 
+let myId = 1
+
+// pulling info from the DB based on email
+export const loader: LoaderFunction = async ({
+}): Promise<UserDto> => {
+  // TODO AUTH
+  // TODO fix hardcoding
+  const myUser: User = (await prisma.user.findUnique({ where: { id: myId }}))!;
+  return new UserDto(myUser);
+}
 
 {/* Default pfp-less image */ }
 let defaultimg = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg"
@@ -12,14 +27,12 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-function isDriver(userInfo: PersonalInfo | DriverInfo): userInfo is DriverInfo {
-  return (userInfo as DriverInfo).points !== undefined
-}
-
 export default function Banner(
-  { userInfo, showSidebar, setShowSidebar }:
-  { userInfo: PersonalInfo | DriverInfo, showSidebar: boolean, setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>}
+  { showSidebar, setShowSidebar }: 
+  { showSidebar: boolean, setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>}
   ) {
+  
+  const myData: UserDto = useLoaderData()
 
   function changeSidebarState() {setShowSidebar(!showSidebar)};
 
@@ -30,7 +43,7 @@ export default function Banner(
           <div className="mx-auto border-b-2 border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray">
             <div className="relative flex h-18 items-center justify-between">
 
-              {/* This stuff is left aligned */}
+              {/* the button for the sidebar */}
               <div className="px-1">
                 <div className="flex items-start justify-start">
                   <div className="inset-y-0 left-0 flex">
@@ -46,16 +59,9 @@ export default function Banner(
 
                 {/* Your name */}
                 <div className="inset-y-0 px-2"> 
-                  {userInfo.name}
+                  {/* For some reason 'myData.name' isn't working so here's a default name for now*/}
+                  { "Steven Wilde" }
                 </div>
-
-                {/* Your points, if you're a driver */}
-                { isDriver(userInfo) ? 
-                  <div className="absolute inset-y-10 px-2 h-2">
-                    {'Points: ' + userInfo.points}
-                  </div> :
-                  <div></div>
-                }
               </div>
             </div>
           </div>

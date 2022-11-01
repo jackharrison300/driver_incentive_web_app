@@ -7,6 +7,7 @@ import { useLoaderData } from '@remix-run/react';
 import { useState } from 'react';
 import { containsHtml } from '../shared_functions';
 import { Form } from '@remix-run/react';
+import {useNavigate} from 'react-router-dom';
 
 let myId = 1
 
@@ -19,6 +20,7 @@ export const loader: LoaderFunction = async ({
   return new UserDto(myUser);
 }
 
+// handling the user inputting a new name/email
 export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> =>{
     const form = await request.formData();
     let [name, email] = [form.get('name'), form.get('email')]
@@ -48,17 +50,15 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
 
 
 export default function profilePage() {
+    const navigate = useNavigate()
     const myData: UserDto = useLoaderData()
     const [updateMode, toggleUpdateMode] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
 
-    const handleMouseOver = () => {
-        setIsHovering(true)
-    }
+    const handleMouseOver = () => { setIsHovering(true) }
 
-    const handleMouseOut = () => {
-        setIsHovering(false)
-    }
+    const handleMouseOut = () => { setIsHovering(false) }
+
     return(
         <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
             
@@ -66,9 +66,9 @@ export default function profilePage() {
             <div className="relative sm:pb-16 basis-2/12 h-screen  border-2 border-lightgray dark:border-darkgray">
                 <div className="py-2" />
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
-                    <a href={"#"}>
+                    <button onClick={() => navigate(-1)}>
                         {"← Back"}
-                    </a>
+                    </button>
                 </div>
 
                 <div className="py-2" />
@@ -79,14 +79,14 @@ export default function profilePage() {
                     {"User Settings"}
                 </div>
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
-                    <a href={"#"}>
+                    <button onClick={() => navigate("/dashboard")}>
                         {"Account"}
-                    </a>
+                    </button>
                 </div>
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
-                    <a href={"#"}>
+                    <button onClick={() => navigate("/profile")}>
                         {"Appearance"}
-                    </a>
+                    </button>
                 </div>
 
                 <div className="py-2" />
@@ -95,9 +95,9 @@ export default function profilePage() {
                 <div className="py-2" />
 
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
-                    <a href={"#"}>
+                    <button onClick={() => navigate("..")}>
                         {"Log out"}
-                    </a>
+                    </button>
                 </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { Company, EnrollmentStatus, Role } from '@prisma/client';
+import { Company, EnrollmentStatus, PointChange, Role } from '@prisma/client';
 import { UserWithSponsorWithCompany, UserWithDriverWithCompany } from './shared_prisma';
 
 export class UserDto {
@@ -79,5 +79,26 @@ export class PurchaseDto {
         this.purchaseStatus = purchaseDto.purchaseStatus ?? ''
         this.driver = purchaseDto.driver ?? ''
         this.cashvalue = purchaseDto.cashvalue ?? 0
+    }
+}
+
+export class PtChangeDto {
+    createdAt: string
+    companyId: number
+    driverId: number
+    pointValue: number
+
+    constructor(PtChangeDto: Partial<PtChangeDto>){
+        this.createdAt = PtChangeDto.createdAt!
+        this.companyId = PtChangeDto.companyId ?? 0
+        this.driverId = PtChangeDto.driverId ?? 0
+        this.pointValue = PtChangeDto.pointValue ?? 0
+    }
+
+    static fromPtChange(pointChange: PointChange){
+        return new PtChangeDto({
+            ...pointChange,
+            createdAt: pointChange.createdAt.toString()
+        })
     }
 }

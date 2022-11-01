@@ -1,4 +1,8 @@
+import { Navigate, useNavigate } from "react-router-dom";
+
 export default function Sidebar(){
+  const navigate = useNavigate()
+
   return(
     <nav className="border-r-2 border-lightgray text-dark font-medium shadow-xl">
       <div className="flex flex-col min-h-screen h-full left-0 w-screen p-4 bg-light md:w-80 text-xl">
@@ -8,52 +12,59 @@ export default function Sidebar(){
         <div className="items-center justify-center">
           <ul className="space-y-1 w-full">
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  Home
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/app")}
+              >
+                Home
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  Profile
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/profile")}
+              >
+                Profile
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  Browse Products
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/sales")}
+              >
+                Browse Products
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  View Cart
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/sales")}
+              >
+                View Cart
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  Checkout
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/sales")}
+              >
+                Checkout
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
-                  Settings
-                </a>
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("/sales")}
+              >
+                Settings
               </button>
             </li>
             <li>
-              <button className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start">
-                <a href="">
+              <button 
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                onClick={() => navigate("..")}
+              >
                   Logout
-                </a>
               </button>
             </li>
           </ul>

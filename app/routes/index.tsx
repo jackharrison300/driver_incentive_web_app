@@ -5,6 +5,7 @@ import useDarkMode from '../components/hooks/useDarkMode';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { useEffect } from "react";
 import useHandleCognitoCode from "../hooks/useHandleCognitoCode";
+import { useNavigate } from "react-router-dom"
 
 type RequestContext = {domainName: string}
 
@@ -47,6 +48,7 @@ export default function LandingPage() {
     const user = useOptionalUser();
     const { loginUrl, signupUrl } = useLoaderData();
     useHandleCognitoCode();
+    const navigate = useNavigate()
     return (
     <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center
                      bg-light text-dark text-xl dark:bg-dark dark:text-light">
@@ -82,13 +84,13 @@ export default function LandingPage() {
                     >
                       Sign up
                     </a>
-                    <a
-                      href={loginUrl}
+                    <button
+                      onClick={() => navigate(loginUrl)}
                       className="flex items-center justify-center rounded-md sm:px-8 px-4 py-3 text-xl font-medium shadow-sm
                                  border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary"
                     >
                       Log In
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
