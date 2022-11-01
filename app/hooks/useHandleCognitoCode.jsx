@@ -43,6 +43,7 @@ const useHandleCognitoCode = () => {
           console.log('stored some cookies... 🍪🍪🍪')
         }
       )
+
     },[]);
 }
 export default useHandleCognitoCode;

@@ -2,8 +2,8 @@ import Banner from '../components/Banner/Banner';
 import Sidebar from '../components/Sidebar/Sidebar';
 import { Outlet } from "@remix-run/react";
 import {PersonalInfo, DriverInfo} from '../components/InfoPages/InfoPages'
-import { useState } from 'react';
-
+import { useState, useEffect  } from 'react';
+import useDarkMode from '../hooks/useDarkMode';
 
 const stevenWilde: PersonalInfo={
   name: 'Steven Wilde',
@@ -22,10 +22,16 @@ const vinDiesel: DriverInfo={
 
 export default function app() {
   let [showSidebar, setShowSidebar] = useState(false);
+  const [darkTheme, setDarkTheme] = useDarkMode();
+
+  useEffect(() => {
+    setDarkTheme(darkTheme);
+  }, [])
+
   return(
     <>
       <Banner userInfo={ stevenWilde } showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
-      <div className="flex">
+      <div className="flex">  
         {showSidebar && <Sidebar />}
         <div className="w-full">
           <Outlet />

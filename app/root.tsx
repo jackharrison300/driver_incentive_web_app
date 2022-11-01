@@ -12,6 +12,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getUser } from "./session.server";
@@ -41,6 +42,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function App() {
+  const queryClient = new QueryClient();
   return (
     <html lang="en" className="h-full">
       <head>
@@ -48,10 +50,12 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </QueryClientProvider >
       </body>
     </html>
   );
