@@ -177,6 +177,7 @@ model Vendor {
   vendorApi String
   apiKey String
   catalogItems CatalogItem[]
+  catalogFilters CatalogFilter[]
 
   @@index([isActive])
 }
@@ -229,4 +230,9 @@ model LoginAttempt {
   passwordChangeDatetime DateTime
   email String
   wasSuccessful Boolean @default(false)
+}
+
+model CatalogFilter {
+  id Int @id @default(autoincrement())
+  term String
 }
