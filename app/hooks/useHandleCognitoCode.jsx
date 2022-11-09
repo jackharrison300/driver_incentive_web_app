@@ -10,8 +10,11 @@ const useHandleCognitoCode = () => {
       }
 
       const currURL = window.location.hostname;
-      const cognitoClientId = process.env.COGNITO_CLIENT_ID;
-      const cognitoURL = process.env.COGNITO_URL;
+      // const cognitoClientId = process.env.COGNITO_CLIENT_ID;
+      const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp";
+      // const cognitoURL = process.env.COGNITO_URL;
+      const cognitoURL = "https://t25.auth.us-east-1.amazoncognito.com";
+
 
       // get JWT from cognito
       // This only works in prod, but localhost
@@ -35,12 +38,14 @@ const useHandleCognitoCode = () => {
         body: authBodyParams
       }).then(
         res => {
-          // store JWT
+          console.log(res.body);
+          // store JWT (but not actually. This usually fails)
           localStorage.setItem('id_token',res.id_token);
           localStorage.setItem('access_token',res.access_token);
           localStorage.setItem('refresh_token',res.refresh_token);
           // redirect to /app
           console.log('stored some cookies... 🍪🍪🍪')
+          window.location.replace("/dashboard");
         }
       )
 
