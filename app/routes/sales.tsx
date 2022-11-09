@@ -23,7 +23,7 @@ class ItemDto {
   static fromEbayItemSummary(data: EbayItemSummary) {
     return new ItemDto({
       vendorId: data.itemId,
-      image: placeholderImage,
+      image: data.image?.imageUrl ?? placeholderImage,
       name: data.title,
       points: data.price?.value ? parseFloat(data.price.value) : 0
     })
@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({}): Promise<ItemDto[]> => {
   let itemsResponse: Response;
   try {
     itemsResponse = await fetch(
-      "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search?q=iphone&limit=3&offset=0", {
+      "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search?q=iphone&limit=10&offset=0", {
         method: "GET",
         headers: new Headers({
           "Authorization": "Bearer " + (await tokenResponse.json() as EbayTokenResponseData).access_token
@@ -75,16 +75,8 @@ export const loader: LoaderFunction = async ({}): Promise<ItemDto[]> => {
   );
 };
 
-// TODO replace with ebay API
-// @ts-ignore
-const items = []
-for(let i =0; i<30; i++){
-    items[i] = new ItemDto({image: placeholderImage, name: "object Object", points: 25*i})
-}
-
 export default function salesPage() {
-  const data = useLoaderData();
-  console.log(data)
+  const items: ItemDto[] = useLoaderData();
 
   // TODO pull driver points from prisma
   const myPoints = 200;
@@ -105,23 +97,14 @@ export default function salesPage() {
 
       {/* the right div, which diplays the list of items */}
       <div className="grid w-1/2 grid-cols-6">
-        {/* @ts-ignore */}
         {items.map((item) => (
           <div className="px-5 py-4" key={item.points}>
-            <img src={item.image} alt="store ItemDto image" />
-            {item.points > myPoints ? (
-              <div className="text-center font-semibold text-red-500">
-                {item.name}
-                <br />
-                {item.points + " points"}
-              </div>
-            ) : (
-              <div className="text-center font-semibold">
-                {item.name}
-                <br />
-                {item.points + " points"}
-              </div>
-            )}
+            <img src={item.image} alt="store item image" />
+            <div className="text-center font-semibold">
+              {item.name}
+              <br />
+              <span className={item.points > myPoints ? 'text-red-500' : 'text-blue-600'}>{item.points + " points"}</span>
+            </div>
           </div>
         ))}
       </div>

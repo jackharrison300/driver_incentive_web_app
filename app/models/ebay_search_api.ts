@@ -6,7 +6,7 @@ export interface EbaySearchResponseData {
     offset: number
     itemSummaries: EbayItemSummary[]
   }
-  
+
   export interface EbayItemSummary {
     itemId: string
     title: string
