@@ -1,6 +1,6 @@
 # Feature flags research
 
-[Feature flags](https://docs.flagsmith.com/) are a tool which allows you to control which parts of react code gets executed, all from outside the program itself. 
+[Feature flags](https://docs.flagsmith.com/) are a tool which will allow you to control which parts of react code gets executed, all from outside the program itself. 
 It is very useful; it allows you to deploy new code for testing without letting people see it, you can set user groups and allow certain groups to only see certain thing, 
 or you can even use it for A/B testing.
 
