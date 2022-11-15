@@ -4,8 +4,9 @@ import { EbayTokenResponseData } from "../models/ebay_token_api";
 import { EbayItemSummary, EbaySearchResponseData } from "../models/ebay_search_api";
 import { useState } from "react";
 import { Outlet } from "@remix-run/react";
-import Banner from "~/components/Banner/Banner";
-import Sidebar from "~/components/Sidebar/Sidebar";
+import Banner from "../components/Banner/Banner";
+import Sidebar from "../components/Sidebar/Sidebar";
+import { CompanyDto } from "../models/dto";
 
 const placeholderImage =
   "https://media.istockphoto.com/vectors/thumbnail-image-vector-graphic-vector-id1147544807?k=20&m=1147544807&s=612x612&w=0&h=pBhz1dkwsCMq37Udtp9sfxbjaMl27JUapoyYpQm0anc=";
