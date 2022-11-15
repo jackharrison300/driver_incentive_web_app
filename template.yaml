@@ -152,6 +152,12 @@ Resources:
             Condition:
               StringEquals:
                 'secretsmanager:ResourceTag/team25': db
+      - PolicyName: CognitoPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: cognito-idp:AdminCreateUser
+            Resource: '*'
   HTTP:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -345,6 +351,8 @@ Resources:
           COGNITO_URL: !Sub https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com
           COGNITO_CLIENT_ID:
             Ref: UserPoolClient
+          COGNITO_USER_POOL_ID:
+            Ref: UserPool
           SESSION_SECRET: '6155bae57eabf011bc77db4b45f5293b'
           ARC_APP_NAME: app-default
           ARC_ENV: staging

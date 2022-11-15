@@ -235,4 +235,6 @@ model LoginAttempt {
 model CatalogFilter {
   id Int @id @default(autoincrement())
   term String
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  vendorId Int
 }

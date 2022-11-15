@@ -1,4 +1,3 @@
-import { CompanyDto } from "../models/dto";
 import { LoaderFunction } from "@remix-run/server-runtime";
 import { useLoaderData } from "@remix-run/react";
 import { EbayTokenResponseData } from "../models/ebay_token_api";
@@ -49,9 +48,8 @@ export const loader: LoaderFunction = async ({}): Promise<ItemDto[]> => {
         "scope": "https://api.ebay.com/oauth/api_scope"
       })
     });
-  }
-  catch {
-    throw new Error("Network failure on Ebay token call")
+  } catch {
+    throw new Error("Network failure on Ebay token call");
   }
   if (!tokenResponse.ok) {
     throw new Error("Ebay call failed - Status code not ok (200-299)");
