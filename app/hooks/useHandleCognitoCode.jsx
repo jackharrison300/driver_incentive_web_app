@@ -45,7 +45,9 @@ const useHandleCognitoCode = () => {
           localStorage.setItem('refresh_token',res.refresh_token);
           // redirect to /app
           console.log('stored some cookies... 🍪🍪🍪')
-          window.location.replace("/dashboard");
+          
+          // direct account types
+          window.location.replace("/app/apply");
         }
       )
 
