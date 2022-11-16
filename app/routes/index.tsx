@@ -84,13 +84,13 @@ export default function LandingPage() {
                     >
                       Sign up
                     </a>
-                    <button
-                      onClick={() => navigate(loginUrl)}
+                    <a
+                      href={loginUrl}
                       className="flex items-center justify-center rounded-md sm:px-8 px-4 py-3 text-xl font-medium shadow-sm
                                  border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary"
                     >
                       Log In
-                    </button>
+                    </a>
                   </div>
                 )}
               </div>
