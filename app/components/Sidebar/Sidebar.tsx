@@ -22,7 +22,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate("/app/profile")}
               >
                 Profile
               </button>
@@ -30,7 +30,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/sales")}
+                onClick={() => navigate("/app/sales")}
               >
                 Browse Products
               </button>
@@ -38,7 +38,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/sales")}
+                onClick={() => navigate("/app/sales")}
               >
                 View Cart
               </button>
@@ -46,7 +46,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/sales")}
+                onClick={() => navigate("/app/sales")}
               >
                 Checkout
               </button>
@@ -54,7 +54,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/sales")}
+                onClick={() => navigate("/app/sales")}
               >
                 Settings
               </button>
