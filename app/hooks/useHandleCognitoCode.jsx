@@ -9,9 +9,6 @@ const useHandleCognitoCode = () => {
         return
       }
 
-      // always 404's, not sure whats going on
-      //window.location.href = 'https://61rc2moud3.execute-api.us-east-1.amazonaws.com/app'
-
       const currURL = window.location.hostname;
       // const cognitoClientId = process.env.COGNITO_CLIENT_ID;
       const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp";

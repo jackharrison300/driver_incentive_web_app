@@ -57,7 +57,7 @@ export default function LandingPage() {
           <div className="relative shadow-xl sm:overflow-hidden">
             <div className="absolute inset-0 border-2 border-lightgray dark:border-darkgray" />
             <div className="relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pb-20 lg:pt-32 bg-gradient-to-b from-t2-brown to-transparent">
-            <div className="p-4"><ThemeIcon /></div>
+            <button className="p-4"><ThemeIcon /></button>
               <h1 className="text-center font-extrabold text-6xl sm:text-8xl lg:text-9xl rounded-xl border-2 border-lightgray dark:border-darkgray pb-4 shadow-xl dark:shadow-darkgray">
                 <span className="block uppercase tracking-tight">T25 WES</span>
               </h1>

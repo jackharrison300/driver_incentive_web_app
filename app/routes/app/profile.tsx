@@ -10,6 +10,8 @@ import { Form } from '@remix-run/react';
 import {useNavigate} from 'react-router-dom';
 
 let myId = 1
+const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp"
+const indexUrl = "https://61rc2moud3.execute-api.us-east-1.amazonaws.com/"
 
 // pulling info from the DB based on email
 export const loader: LoaderFunction = async ({
@@ -59,6 +61,14 @@ export default function profilePage() {
 
     const handleMouseOut = () => { setIsHovering(false) }
 
+    const logout = ()=>{/*
+        GET https://t25.auth.us-east-1.amazoncognito.com/logout?
+
+        client_id = cognitoClientId
+        logout_uri = indexUrl
+
+*/}
+
     return(
         <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
             
@@ -95,7 +105,10 @@ export default function profilePage() {
                 <div className="py-2" />
 
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
-                    <button onClick={() => navigate("..")}>
+                    <button onClick={() => {
+                        navigate(".."),
+                        logout()
+                    }}>
                         {"Log out"}
                     </button>
                 </div>
@@ -166,7 +179,7 @@ export default function profilePage() {
                     onMouseOver={handleMouseOver} 
                     onMouseOut={handleMouseOut}
                     href={"#"} 
-                    className="mx-4 px-2 py-1 font-bold not-italic text-black text-lg border-2 border-transparent hover:border-lightgray hover:shadow-lg"
+                    className="mx-4 px-2 py-1 font-bold not-italic text-black text-lg border-2 border-transparent hover:border-lightgray hover:shadow-lg dark:text-light"
                 >
                     {"Change Password"}
                 </a><br/>

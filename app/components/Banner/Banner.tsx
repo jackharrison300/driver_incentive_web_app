@@ -3,12 +3,27 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { PersonalInfo, DriverInfo } from '../InfoPages/InfoPages'
 import useDarkMode from '../hooks/useDarkMode'
 import { LoaderFunction } from '@remix-run/server-runtime'
+import { FaSun, FaMoon } from 'react-icons/fa';
 import { UserDto } from '~/models/dto'
 import { prisma } from 'server'
 import { User } from '@prisma/client'
 import { useLoaderData } from '@remix-run/react'
 
 let myId = 1
+
+const ThemeIcon = () => {
+  const [darkTheme, setDarkTheme] = useDarkMode();
+  const handleMode = () => setDarkTheme(!darkTheme);
+  return (
+    <span onClick={handleMode}>
+      {darkTheme ? (
+        <FaSun size='24' className='top-navigation-icon' />
+      ) : (
+        <FaMoon size='24' className='top-navigation-icon' />
+      )}
+    </span>
+  );
+};
 
 // pulling info from the DB based on email
 export const loader: LoaderFunction = async ({
@@ -43,13 +58,14 @@ export default function Banner(
           <div className="mx-auto border-b-2 border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray">
             <div className="relative flex h-18 items-center justify-between">
 
-              {/* the button for the sidebar */}
-              <div className="px-1">
+              {/* the button for the sidebar and the dark mode toggle switch */}
+              <div className="px-4">
                 <div className="flex items-start justify-start">
                   <div className="inset-y-0 left-0 flex">
-                      <button className="text-4xl mb-2 text-dark hover:text-primary" onClick={changeSidebarState}>
-                         ≡
-                      </button>
+                    <button className="text-4xl mb-2 hover:text-primary" onClick={changeSidebarState}>
+                      ≡
+                    </button>
+                    <button className="p-4"><ThemeIcon/></button>
                   </div>
                 </div>
               </div>

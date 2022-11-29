@@ -3,6 +3,7 @@ import { Role, SsoProvider } from '@prisma/client';
 import { ActionFunction, DataFunctionArgs, json } from '@remix-run/server-runtime';
 import { containsHtml } from '../../shared_functions';
 import { prisma } from '../../../server';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
 export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> => {
@@ -37,6 +38,8 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
 }
 
 export default function Apply() {
+  const navigate = useNavigate()
+
   return (
     <>
       <Formik
@@ -77,7 +80,7 @@ export default function Apply() {
                 {/* First name */}
                 <div className="block mb-4">
                   <label>First name</label>
-                  <Field name="firstName" type="text" placeholder="John" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md"/>
+                  <Field name="firstName" type="text" placeholder="John" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md dark:text-dark"/>
                   <div className="text-red-500 text-lg">
                     <ErrorMessage name="firstName"/>
                   </div>
@@ -86,7 +89,7 @@ export default function Apply() {
                 {/* Last name */}
                 <div className="block mb-4">
                   <label>Last name</label>
-                  <Field name="lastName" type="text" placeholder="Doe" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md"/>
+                  <Field name="lastName" type="text" placeholder="Doe" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md dark:text-dark"/>
                   <div className="text-red-500 text-lg">
                     <ErrorMessage name="lastName"/>
                   </div>
@@ -95,7 +98,7 @@ export default function Apply() {
                 {/* Company */}
                 <div className="block mb-4">
                   <label>Company name</label>
-                  <Field name="company" type="text" placeholder="T25 WES" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md"/>
+                  <Field name="company" type="text" placeholder="T25 WES" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md dark:text-dark"/>
                   <div className="text-red-500 text-lg">
                     <ErrorMessage name="company"/>
                   </div>
@@ -104,7 +107,7 @@ export default function Apply() {
               {/* Email */} 
               <div className="block mb-4 text-start">
                 <label htmlFor="email">Email address</label>
-                <Field name="email" type="email" placeholder="johndoe@example.com" className="w-full block px-4 py-2 border-2 border-lightgray shadow-md"/>
+                <Field name="email" type="email" placeholder="johndoe@example.com" className="w-full block px-4 py-2 border-2 border-lightgray shadow-md dark:text-dark"/>
                 <div className="text-red-500 text-lg">
                   <ErrorMessage name="email"/>
                 </div>
@@ -113,13 +116,16 @@ export default function Apply() {
               {/* Reason for application */} 
               <div className="block text-start">
                 <label>Reason</label>
-                <textarea id="large-input" placeholder="Why are you applying with us?" className="w-full block px-4 py-2 mb-4 border-2 border-lightgray shadow-md"/>
+                <textarea id="large-input" placeholder="Why are you applying with us?" className="w-full block px-4 py-2 mb-4 border-2 border-lightgray shadow-md dark:text-dark"/>
               </div>
 
               {/* Submit */} 
               <div className="block text-center">
-                <button className="px-4 py-2 border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary shadow-md"
-                        type="submit">
+                <button 
+                  className="px-4 py-2 border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary shadow-md"
+                  type="submit"
+                  onClick={() => navigate("/app")}
+                >
                   Submit
                 </button>
               </div>

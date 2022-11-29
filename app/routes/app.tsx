@@ -13,7 +13,7 @@ export default function app() {
   }, [])
 
   return(
-    <>
+    <main className="h-screen dark:bg-dark">
       <Banner showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
       <div className="flex">
         {showSidebar && <Sidebar />}
@@ -21,6 +21,6 @@ export default function app() {
           <Outlet />
         </div>
       </div>
-    </>
+    </main>
   )
 }
