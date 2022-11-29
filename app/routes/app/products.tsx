@@ -78,44 +78,30 @@ export const loader: LoaderFunction = async ({}): Promise<ItemDto[]> => {
   );
 };
 
-export default function salesPage() {
-    
-    const items: ItemDto[] = useLoaderData();
-    // TODO pull driver points from prisma
-    const myPoints = 200
-    const myCompany: CompanyDto = useLoaderData();
-    let [showSidebar, setShowSidebar] = useState(false);
+export default function Products() {  
+  const items: ItemDto[] = useLoaderData();
+  // TODO pull driver points from prisma
+  const myPoints = 200
+  const myCompany: CompanyDto = useLoaderData();
+  let [showSidebar, setShowSidebar] = useState(false);
 
-    return(
-      <>
-        <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
-          {/* the left div, containing the sponsor logo and a change sponsor button and a search bar */}
-          <div className="relative w-1/3 bg-dark">
-            <div className="bg-dark p-10">
-              {/* TDO fix companyDto returning null so I can uncomment this */}
-              {/*{myCompany.logoUrl !== "" ?
-                      <img src={placeholderImage} alt="Company logo"/>:
-                      <img src={myCompany.logoUrl} alt="blank company logo"/>
-                      }
-                    <div className="font-bold text-lg">{myCompany.name}</div>*/}
-            </div>
-          </div>
-                
-
-          {/* the right div, which diplays the list of items */}
-          <div className="relative grid w-1/2 grid-cols-6">
-            {items.map((item) => (
-              <div className="px-5 py-4" key={item.points}>
-                <img src={item.image} alt="store item image" />
-                <div className="text-center font-semibold">
-                  {item.name}
-                  <br />
-                  <span className={item.points > myPoints ? 'text-red-500' : 'text-blue-600'}>{item.points + " points"}</span>
-                </div>
+  return(
+    <>
+      <main className="relative min-h-screen sm:flex sm:items-center sm:justify-center bg-light text-dark dark:bg-dark dark:text-light">
+        {/* the right div, which diplays the list of items */}
+        <div className="relative grid-rows-auto w-1/2 grid-cols-6">
+          {items.map((item) => (
+            <div className="px-5 py-4" key={item.points}>
+              <img src={item.image} alt="store item image" />
+              <div className="text-center font-semibold">
+                {item.name}
+                <br />
+                <span className={item.points > myPoints ? 'text-red-500' : 'text-blue-600'}>{item.points + " points"}</span>
               </div>
-            ))}
-          </div>
-        </main>
+            </div>
+          ))}
+        </div>
+      </main>
     </>
   );
 }

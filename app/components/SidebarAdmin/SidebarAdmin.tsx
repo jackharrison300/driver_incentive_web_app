@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 
-export default function Sidebar(){
+export default function SidebarAdmin(){
   const navigate = useNavigate()
 
   return(
@@ -14,7 +14,7 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app")}
+                onClick={() => navigate("/admin")}
               >
                 Home
               </button>
@@ -22,39 +22,23 @@ export default function Sidebar(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/profile")}
+                onClick={() => navigate("/admin/dashboard")}
               >
-                Profile
+                Manage Users
               </button>
             </li>
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/products")}
+                onClick={() => navigate("/admin/manage-catalog")}
               >
-                Browse Products
+                Manage Catalogs
               </button>
             </li>
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/cart")}
-              >
-                View Cart
-              </button>
-            </li>
-            <li>
-              <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/apply")}
-              >
-                Apply
-              </button>
-            </li>
-            <li>
-              <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/settings")}
+                onClick={() => navigate("/admin/settings")}
               >
                 Settings
               </button>
