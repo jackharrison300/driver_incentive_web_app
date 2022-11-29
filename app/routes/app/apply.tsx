@@ -26,7 +26,7 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
   // we could add some try catches here for graceful error handling
   const user = await prisma.user.create({ data: {
     name: (name as string),
-    email: (email as string), // this typecast is safe because of validation above
+    email: (email as string), // this type assertion is safe because of validation above
     ssoProvider: SsoProvider.COGNITO_USER_POOL,
     // TODO: Implement w/ cognito id
     ssoIdentifier: (email as string),

@@ -389,7 +389,7 @@ export default function Dashboard() {
               leaveTo='opacity-0 scale-95'
               beforeEnter={setSelectEditCompany}
             >
-              <Dialog.Panel className='w-full max-w-md transform overflow-hidden bg-light p-6 text-left align-middle shadow-xl transition-all border-2'>
+              <Dialog.Panel className='transform overflow-hidden bg-light p-6 text-left align-middle shadow-xl transition-all border-2'>
                 <Dialog.Title
                   as='h3'
                   className='text-center text-lg font-medium leading-6'
@@ -399,23 +399,15 @@ export default function Dashboard() {
                 <div className='mt-2'>
                 <Form method='post' action={'/api/edit-' + selected.lowercaseName} onSubmit={() => setIsEditOpen(false)} className='w-full max-w-lg'>
                   {['Sponsor', 'Driver', 'Admin'].includes(selected.name) &&
-                  <>
                   <div className='flex flex-wrap -mx-3 mb-2'>
-                    <div className='w-full md:w-1/2 px-3'>
+                    <div className='w-full px-3'>
                       <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-name'>
                         Name
                       </label>
                       <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='name' id='edit-name' type='text' defaultValue={selectedEdit?.name} required/>
                     </div>
-                    <div className='w-full md:w-1/2 px-3'>
-                      <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='edit-email'>
-                        Email
-                      </label>
-                      <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='email' id='edit-email' type='text' defaultValue={(selectedEdit as DashboardUserDto | null)?.email} required/>
-                    </div>
+                    <input type='hidden' name='email' value={(selectedEdit as DashboardUserDto | null)?.email}/>
                   </div>
-                  <input type='hidden' name='originalEmail' value={(selectedEdit as DashboardUserDto | null)?.email}/>
-                  </>
                   }
                   {['Sponsor', 'Driver'].includes(selected.name) &&
                   <div className='flex flex-wrap -mx-3 mb-2'>
@@ -424,7 +416,7 @@ export default function Dashboard() {
                         Company
                       </label>
                       <div className='relative'>
-                        <select className='block appearance-none w-full bg-gray-200 border border-lightgray text-gray-700 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-light focus:border-lightgray' name='companyId' id='edit-user-company' required>
+                        <select className='block appearance-none w-full bg-gray-200 border border-lightgray text-gray-700 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-light focus:border-lightgray' name='newCompanyId' id='edit-user-company' required>
                           {data.companyDtos.map((company) =>
                             <option key={company.id} value={company.id.toString()}>{company.name}</option>
                           )}
@@ -434,6 +426,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
+                    <input type='hidden' name='oldCompanyId' value={(selectedEdit as SponsorDto | DriverDto | null)?.companyId}/>
                   </div>
                   }
                   {'Company' === selected.name &&
@@ -452,7 +445,7 @@ export default function Dashboard() {
                       <input className='appearance-none block w-full bg-gray-200 text-gray-700 border border-lightgray py-3 px-4 leading-tight focus:outline-none focus:bg-light' name='pointDollarValue' id='edit-point-value' type='number' defaultValue={(selectedEdit as CompanyDto)?.pointDollarValue} step='0.01' onInput={limitDecimalPlaces} required/>
                     </div>
                   </div>
-                  <input type='hidden' name='originalName' value={(selectedEdit as CompanyDto | null)?.name}/>
+                  <input type='hidden' name='companyId' value={(selectedEdit as CompanyDto | null)?.id}/>
                   </>
                   }
                   <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>

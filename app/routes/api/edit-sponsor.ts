@@ -1,45 +1,58 @@
+import { CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 import { ActionFunction, DataFunctionArgs, json, redirect } from '@remix-run/server-runtime';
 import { prisma } from '../../../server';
-import { containsHtml } from '../../shared_functions';
+import { cognitoAddUserToGroup, cognitoAdminRemoveUserFromGroup, cognitoAdminUpdateUserAttributes, containsHtml } from '../../shared_functions';
 
 export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> => {
 
   const form = await request.formData();
-  const [name, email, companyIdStr, originalEmail, redirectUri] = [form.get('name'), form.get('email'), form.get('companyId'), form.get('originalEmail'), form.get('redirectUri')];
-  const errors: {name?: string, email?: string, companyId?: string, originalEmail?: string, redirectUri?: string} = {};
+  const [nameUnchecked, emailUnchecked, oldCompanyIdStrUnchecked, newCompanyIdStrUnchecked, redirectUriUnchecked] = [form.get('name'), form.get('email'), form.get('oldCompanyId'), form.get('newCompanyId'), form.get('redirectUri')];
+  const errors: {name?: string, email?: string, oldCompanyId?: string, newCompanyId?: string, redirectUri?: string} = {};
 
   // validate the fields
   // note: here I'm doing xss validation on input. this is fine for our purposes, but encoding on
   // output is more robust. see: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding
-  if (typeof name !== 'string' || containsHtml(name))
+  if (typeof nameUnchecked !== 'string' || containsHtml(nameUnchecked))
     errors.name = 'Invalid name';
-  if (typeof email !== 'string' || containsHtml(email) || !email.includes('@'))
+  if (typeof emailUnchecked !== 'string' || containsHtml(emailUnchecked) || !emailUnchecked.includes('@'))
     errors.email = 'Invalid email address';
-  if (typeof companyIdStr !== 'string' || containsHtml(companyIdStr))
-    errors.companyId = 'Invalid company id';
-  const companyIdNum = parseInt(companyIdStr as string);
-  if (isNaN(companyIdNum))
-    errors.companyId = 'Invalid company id';
-  if (typeof originalEmail !== 'string')
-    errors.originalEmail = 'Invalid original email address';
-  if (typeof redirectUri !== 'string')
+  if (typeof oldCompanyIdStrUnchecked !== 'string' || containsHtml(oldCompanyIdStrUnchecked))
+    errors.oldCompanyId = 'Invalid company id';
+  const oldCompanyIdNum = parseInt(oldCompanyIdStrUnchecked as string);
+  if (isNaN(oldCompanyIdNum))
+    errors.oldCompanyId = 'Invalid company id';
+  if (typeof newCompanyIdStrUnchecked !== 'string' || containsHtml(newCompanyIdStrUnchecked))
+    errors.newCompanyId = 'Invalid company id';
+  const newCompanyIdNum = parseInt(newCompanyIdStrUnchecked as string);
+  if (isNaN(newCompanyIdNum))
+    errors.newCompanyId = 'Invalid company id';
+  if (typeof redirectUriUnchecked !== 'string')
     errors.redirectUri = 'Invalid redirect uri';
   if (Object.keys(errors).length)
     return json(errors, { status: 422 });
 
-  // we could add some try catches here for graceful error handling
+  const [name, email, oldCompanyIdStr, newCompanyIdStr, redirectUri] = [nameUnchecked as string, emailUnchecked as string, oldCompanyIdStrUnchecked as string, newCompanyIdStrUnchecked, redirectUriUnchecked as string];
+
   const user = await prisma.user.update({
-    where: { email: (originalEmail as string) },
+    where: { email },
     data: {
-        email: (email as string), // this typecast is safe because of validation above
-        name: (name as string)
+      name
     }
   });
-  await prisma.sponsor.update({
-    where: { userId: user.id },
-    data: {
-        companyId: companyIdNum
-    }
-  });
-  return redirect(redirectUri as string);
+
+  const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
+  await Promise.all([
+    cognitoAdminUpdateUserAttributes(client, email, name),
+    oldCompanyIdStr !== newCompanyIdStr ? Promise.all([
+      prisma.sponsor.update({
+        where: { userId: user.id },
+        data: {
+            companyId: newCompanyIdNum
+        }
+      }),
+      cognitoAdminRemoveUserFromGroup(client, email, oldCompanyIdStr + '_sponsors'),
+      cognitoAddUserToGroup(client, email, newCompanyIdStr + '_sponsors')
+    ]) : Promise.resolve()
+  ]);
+  return redirect(redirectUri);
 }

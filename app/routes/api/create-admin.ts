@@ -1,8 +1,8 @@
-import { Admin, Role, SsoProvider } from '@prisma/client';
+import { Role, SsoProvider } from '@prisma/client';
 import { ActionFunction, DataFunctionArgs, json, redirect } from '@remix-run/server-runtime';
-import { AdminCreateUserCommand, AdminCreateUserCommandOutput, CognitoIdentityProviderClient, CognitoIdentityProviderClientResolvedConfig } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 import { prisma } from '../../../server';
-import { containsHtml } from '../../shared_functions';
+import { cognitoAddUserToGroup, cognitoCreateUser, containsHtml } from '../../shared_functions';
 
 export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> => {
 
@@ -25,33 +25,21 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
   // these type assertions are safe because of validation above
   const [name, email, redirectUri] = [nameUnchecked as string, emailUnchecked as string, redirectUriUnchecked as string];
 
-  // create cognito user
   const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
-  const command = new AdminCreateUserCommand({
-    UserPoolId: process.env.COGNITO_USER_POOL_ID!,
-    Username: email,
-    UserAttributes: [{ Name: 'name', Value: name }],
-  });
-  let response: AdminCreateUserCommandOutput;
-  try {
-    response = await client.send(command);
-  } catch(e) {
-    throw new Error("Network failure on Cognito call\n" + e);
-  }
-  if (response.$metadata.httpStatusCode !== 200) {
-    throw new Error("Cognito call failed - Status code != 200");
-  }
+  const cognitoUsername = (await cognitoCreateUser(client, email, name)).User!.Username!;
 
-  // create user in db
-  // we could add some try catches here for graceful error handling
-  const user = await prisma.user.create({ data: {
-    email: (email as string),
-    name: (name as string),
-    ssoProvider: SsoProvider.COGNITO_USER_POOL,
-    // TODO: Implement w/ cognito id
-    ssoIdentifier: (email as string),
-    role: Role.ADMIN
-  }});
+  const [, user] = await Promise.all([
+    cognitoAddUserToGroup(client, email, 'admins'),
+    // create user in db
+    // we could add some try catches here for graceful error handling
+    prisma.user.create({ data: {
+      email,
+      name,
+      ssoProvider: SsoProvider.COGNITO_USER_POOL,
+      ssoIdentifier: cognitoUsername,
+      role: Role.ADMIN
+    }})
+  ]);
   await prisma.admin.create({ data: { userId: user.id }});
-  return redirect(redirectUri as string);
+  return redirect(redirectUri);
 }

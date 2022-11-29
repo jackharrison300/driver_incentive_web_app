@@ -9,8 +9,8 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
   for (const pair of form.entries()) {
     console.log(`${pair[0]}, ${pair[1]}`);
   }
-  const [name, pointDollarValue, originalName, redirectUri] = [form.get('name'), form.get('pointDollarValue'), form.get('originalName'), form.get('redirectUri')];
-  const errors: {name?: string, pointDollarValue?: string, originalName?: string, redirectUri?: string} = {};
+  const [name, pointDollarValue, companyIdStrUnchecked, redirectUri] = [form.get('name'), form.get('pointDollarValue'), form.get('companyId'), form.get('redirectUri')];
+  const errors: {name?: string, pointDollarValue?: string, companyId?: string, redirectUri?: string} = {};
 
   // validate the fields
   // note: here I'm doing xss validation on input. this is fine for our purposes, but encoding on
@@ -19,8 +19,11 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
     errors.name = 'Invalid name';
   if (typeof pointDollarValue !== 'string')
     errors.pointDollarValue = 'Invalid point dollar value';
-  if (typeof originalName !== 'string')
-    errors.originalName = 'Invalid original name';
+  if (typeof companyIdStrUnchecked !== 'string' || containsHtml(companyIdStrUnchecked))
+    errors.companyId = 'Invalid company id';
+  const companyIdNum = parseInt(companyIdStrUnchecked as string);
+  if (isNaN(companyIdNum))
+    errors.companyId = 'Invalid company id';
   if (typeof redirectUri !== 'string')
     errors.redirectUri = 'Invalid redirect uri';
   if (Object.keys(errors).length)
@@ -28,9 +31,10 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
 
   // we could add some try catches here for graceful error handling
   await prisma.company.update({
-    where: { name: (originalName as string) },
+    where: { id: companyIdNum },
     data: {
-        pointDollarValue: new Prisma.Decimal(pointDollarValue as string) // this typecast is safe because of validation above
+        name: (name as string), // this type assertion is safe because of validation above
+        pointDollarValue: new Prisma.Decimal(pointDollarValue as string)
     }
   });
   return redirect(redirectUri as string);

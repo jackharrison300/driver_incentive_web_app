@@ -14,10 +14,12 @@ export class UserDto {
 }
 
 export class SponsorDto extends UserDto {
+    companyId: number;
     companyName: string;
 
     constructor(sponsorDto: Partial<SponsorDto>) {
         super(sponsorDto);
+        this.companyId = sponsorDto.companyId ?? 0;
         this.companyName = sponsorDto.companyName ?? '';
     }
 
@@ -27,11 +29,13 @@ export class SponsorDto extends UserDto {
 }
 
 export class DriverDto extends UserDto {
+    companyId: number;
     companyName: string;
     enrollmentStatus: EnrollmentStatus;
 
     constructor(driverDto: Partial<DriverDto>) {
         super(driverDto);
+        this.companyId = driverDto.companyId ?? 0;
         this.companyName = driverDto.companyName ?? '';
         this.enrollmentStatus = driverDto.enrollmentStatus ?? EnrollmentStatus.NOT_APPLIED;
     }
