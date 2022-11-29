@@ -1,11 +1,11 @@
-import useDarkMode from '../components/hooks/useDarkMode';
+import useDarkMode from '../../components/hooks/useDarkMode';
 import { User } from '@prisma/client';
-import { prisma } from '../../server';
-import { UserDto } from '../models/dto';
+import { prisma } from '../../../server';
+import { UserDto } from '../../models/dto';
 import { LoaderFunction, ActionFunction, DataFunctionArgs, redirect } from '@remix-run/server-runtime';
 import { useLoaderData } from '@remix-run/react';
 import { useState } from 'react';
-import { containsHtml } from '../shared_functions';
+import { containsHtml } from '../../shared_functions';
 import { Form } from '@remix-run/react';
 import {useNavigate} from 'react-router-dom';
 
