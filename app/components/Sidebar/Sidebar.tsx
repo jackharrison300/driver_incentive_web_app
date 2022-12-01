@@ -79,8 +79,8 @@ export default function Sidebar(){
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
                 onClick={() => {
-                  //navigate(".."),
-                  logout()
+                  navigate("..")
+                  //logout()
               }}>
                   Logout
               </button>
