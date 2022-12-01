@@ -106,8 +106,8 @@ export default function profilePage() {
 
                 <div className="mx-4 px-2 font-bold border-2 border-transparent hover:border-lightgray hover:shadow-lg">
                     <button onClick={() => {
-                        navigate(".."),
-                        logout()
+                        navigate("..")
+                        //logout()
                     }}>
                         {"Log out"}
                     </button>

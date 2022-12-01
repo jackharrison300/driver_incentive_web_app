@@ -40,13 +40,7 @@ export const loader: LoaderFunction = async (): Promise<DashboardData> => {
 }
 
 export default function Dashboard() {
-    const data: DashboardData = useLoaderData();
-
-    const userInfo = {
-      name: 'Steven Wilde',
-      pfp: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-    }
-    
+    const data: DashboardData = useLoaderData();    
 
     const roleDisplays = React.useMemo(() => [
       { name: 'Admin',   lowercaseName: 'admin'   },
@@ -153,9 +147,9 @@ export default function Dashboard() {
             {/* This stuff is right aligned */}
             <div className='absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'>
 
-              {/* Your name */}
+              {/* Your name, if functionality is achieved */}
               <div className='inset-y-0 px-2'> 
-                {userInfo.name}
+                
               </div>
             </div>
           </div>
