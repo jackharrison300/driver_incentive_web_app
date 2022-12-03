@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
+//@ts-ignore
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -102,34 +103,34 @@ export default function ManageCatalog() {
               </button>
             </div>
             <div className="relative items-center justify-center flex flex-row flex-wrap my-4 mx-8">
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
-              <div className="border-2 border-dark p-10 m-2">
+              <div className="border-2 border-dark p-10 m-2 dark:border-lightgray">
                 Item
               </div>
             </div>
