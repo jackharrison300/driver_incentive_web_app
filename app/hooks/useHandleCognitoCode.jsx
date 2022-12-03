@@ -63,9 +63,9 @@ const useHandleCognitoCode = () => {
         const userPools = userInfo['cognito:groups'];
 
         if (userPools === undefined) window.location.replace("/app/apply");
-        else if (userPools[0] === 'admins') window.location.replace("/dashboard");
-        else if (userPools[0].split('_')[0] === 'drivers') window.location.replace("/app/products");
-        
+        else if (userPools[0] === 'admins') window.location.replace("/admin/dashboard");
+        else if (userPools[0].split('_')[1] === 'sponsors') window.location.replace("/sponsor/dashboard");
+        else if (userPools[0].split('_')[1] === 'drivers') window.location.replace("/app/products");
       })();
 
     },[]);
