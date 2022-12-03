@@ -1,5 +1,14 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 
+function parseJwt (token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+}
 const useHandleCognitoCode = () => {
     useEffect (() => {
       const queryParam = window.location.search;
@@ -9,7 +18,8 @@ const useHandleCognitoCode = () => {
         return
       }
 
-      const currURL = window.location.hostname;
+      const currURL = (process.env.NODE_ENV == "development") ? 'http://localhost:3000' :
+        'https://' + window.location.hostname;
       // const cognitoClientId = process.env.COGNITO_CLIENT_ID;
       const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp";
       // const cognitoURL = process.env.COGNITO_URL;
@@ -22,34 +32,41 @@ const useHandleCognitoCode = () => {
         grant_type: "authorization_code",
         code: currURLParams.get('code')?.toString(),
         client_id: cognitoClientId,
-        redirect_uri: currURL + '/app',
+        redirect_uri: currURL,
         scope: "openid"
       });
       console.log(authBodyParams.toString());
       const tokenURL = new URL(cognitoURL + '/oauth2/token');
-    
-
       console.log(authBodyParams);
       console.log(tokenURL);
 
-      const res = fetch(tokenURL, { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
-        body: authBodyParams
-      }).then(
-        res => {
-          console.log(res.body);
-          // store JWT (but not actually. This usually fails)
-          localStorage.setItem('id_token',res.id_token);
-          localStorage.setItem('access_token',res.access_token);
-          localStorage.setItem('refresh_token',res.refresh_token);
-          // redirect to /app
-          console.log('stored some cookies... 🍪🍪🍪')
-          
-          // direct account types
-          window.location.replace("/app/apply");
-        }
-      )
+      (async () => {
+        const res = await fetch(tokenURL, { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: authBodyParams.toString()
+        });
+
+        const res_json = await res.json();
+        console.log(res_json)
+        // store JWT (but not actually. This usually fails)
+        sessionStorage.setItem('id_token', res_json.id_token);
+        sessionStorage.setItem('access_token', res_json.access_token);
+        sessionStorage.setItem('refresh_token', res_json.refresh_token);
+        // redirect to /app
+        console.log('stored some cookies... 🍪🍪🍪')
+
+        const userInfo = parseJwt(res_json.id_token);
+        console.log(userInfo)
+        const userPools = userInfo['cognito:groups'];
+
+        if (userPools === undefined) window.location.replace("/app/apply");
+        else if (userPools[0] === 'admins') window.location.replace("/dashboard");
+        else if (userPools[0].split('_')[0] === 'drivers') window.location.replace("/app/products");
+        
+      })();
 
     },[]);
 }

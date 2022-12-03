@@ -3,7 +3,7 @@ import { useOptionalUser } from "~/utils";
 import type { LoaderFunction } from "@remix-run/node";
 import useDarkMode from '../components/hooks/useDarkMode';
 import { FaSun, FaMoon } from 'react-icons/fa';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useHandleCognitoCode from "../hooks/useHandleCognitoCode";
 import { useNavigate } from "react-router-dom"
 

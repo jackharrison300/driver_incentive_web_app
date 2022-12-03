@@ -156,7 +156,7 @@ Resources:
         PolicyDocument:
           Statement:
           - Effect: Allow
-            Action: cognito-idp:AdminCreateUser
+            Action: cognito-idp:*
             Resource: '*'
   HTTP:
     Type: AWS::Serverless::HttpApi
