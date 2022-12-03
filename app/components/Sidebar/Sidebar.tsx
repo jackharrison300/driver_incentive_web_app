@@ -37,7 +37,7 @@ export default function Sidebar(){
             </li>
             <li>
               <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
                 onClick={() => navigate("/app/profile")}
               >
                 Profile
@@ -45,7 +45,7 @@ export default function Sidebar(){
             </li>
             <li>
               <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
                 onClick={() => navigate("/app/products")}
               >
                 Browse Products
@@ -53,7 +53,7 @@ export default function Sidebar(){
             </li>
             <li>
               <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
                 onClick={() => navigate("/app/cart")}
               >
                 View Cart
@@ -61,18 +61,10 @@ export default function Sidebar(){
             </li>
             <li>
               <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
+                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
                 onClick={() => navigate("/app/apply")}
               >
                 Apply
-              </button>
-            </li>
-            <li>
-              <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-darkgray hover:shadow-xl text-start"
-                onClick={() => navigate("/app/settings")}
-              >
-                Settings
               </button>
             </li>
             <li>

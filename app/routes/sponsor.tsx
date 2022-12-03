@@ -1,5 +1,5 @@
 import Banner from '../components/Banner/Banner';
-import SidebarAdmin from '../components/SidebarAdmin/SidebarAdmin';
+import SidebarSponsor from '../components/SidebarSponsor/SidebarSponsor';
 import { Outlet } from "@remix-run/react";
 import { useState, useEffect } from 'react';
 import useDarkMode from '~/components/hooks/useDarkMode';
@@ -16,7 +16,7 @@ export default function admin() {
     <main className="h-screen dark:bg-dark">
       <Banner showSidebar={showSidebar} setShowSidebar={setShowSidebar}/>
       <div className="flex">
-        {showSidebar && <SidebarAdmin />}
+        {showSidebar && <SidebarSponsor />}
         <div className="w-full">
           <Outlet />
         </div>

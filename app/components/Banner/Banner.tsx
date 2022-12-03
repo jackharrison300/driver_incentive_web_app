@@ -65,14 +65,14 @@ export default function Banner(
                     <button className="text-4xl mb-2 hover:text-primary" onClick={changeSidebarState}>
                       ≡
                     </button>
-                    <button className="p-4"><ThemeIcon/></button>
                   </div>
                 </div>
               </div>
 
               {/* This stuff is right aligned */}
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-
+                {/* light/dark toggle */}
+                <button className="p-4"><ThemeIcon/></button>
                 {/* Your name, if functionality is achieved */}
                 <div className="inset-y-0 px-2"> 
                   

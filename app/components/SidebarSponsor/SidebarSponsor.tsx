@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 
-export default function SidebarAdmin(){
+export default function SidebarSponsor(){
   const navigate = useNavigate()
 
   return(
@@ -14,7 +14,7 @@ export default function SidebarAdmin(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
-                onClick={() => navigate("/admin")}
+                onClick={() => navigate("/sponsor")}
               >
                 Home
               </button>
@@ -22,25 +22,9 @@ export default function SidebarAdmin(){
             <li>
               <button 
                 className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
-                onClick={() => navigate("/admin/dashboard")}
+                onClick={() => navigate("/sponsor/dashboard")}
               >
                 Manage Users
-              </button>
-            </li>
-            <li>
-              <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
-                onClick={() => navigate("/admin/manage-catalog")}
-              >
-                Manage Catalogs
-              </button>
-            </li>
-            <li>
-              <button 
-                className="px-2 py-1 w-full border-2 border-transparent hover:border-lightgray dark:hover:border-lightgray hover:shadow-xl text-start"
-                onClick={() => navigate("/admin/settings")}
-              >
-                Settings
               </button>
             </li>
             <li>

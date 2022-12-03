@@ -3,9 +3,9 @@ import { LoaderFunction } from '@remix-run/server-runtime';
 import { useTable, Column, TableOptions } from 'react-table';
 import React, { Fragment, useState } from 'react';
 import { User, Role, Company, Sponsor } from '@prisma/client';
-import { prisma } from '../../server';
-import { CompanyDto, DriverDto, SponsorDto, UserDto } from '../models/dto';
-import { UserWithDriverWithCompany, UserWithSponsorWithCompany } from '../models/shared_prisma';
+import { prisma } from '../../../server';
+import { CompanyDto, DriverDto, SponsorDto, UserDto } from '../../models/dto';
+import { UserWithDriverWithCompany, UserWithSponsorWithCompany } from '../../models/shared_prisma';
 import { Dialog, Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 
@@ -128,38 +128,12 @@ export default function Dashboard() {
     }
 
     return (
-      <>
-      <nav className='bg-light text-dark text-xl font-medium'>
-        <div className='mx-auto border-b-2 border-light-gray dark:bg-dark dark:text-light dark:border-dark-gray'>
-          <div className='relative flex h-18 items-center justify-between'>
-
-            {/* This stuff is left aligned -- to be replaced with link to reports*/}
-            <div className='px-1'>
-              <div className='flex items-start justify-start'>
-                <div className='inset-y-0 left-0 flex'>
-                    <button className='text-4xl mb-2 text-dark hover:text-primary'>
-                        ≡
-                    </button>
-                </div>
-              </div>
-            </div>
-
-            {/* This stuff is right aligned */}
-            <div className='absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'>
-
-              {/* Your name, if functionality is achieved */}
-              <div className='inset-y-0 px-2'> 
-                
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <main className="dark:text-light">
       <div className='flex justify-center mt-2'><h1 className='text-xl font-bold'>Dashboard</h1></div>
       <div className='flex justify-center'>
         <div className='block w-[40rem] mt-2'>
           <Listbox value={selected} onChange={setSelected}>
-            <Listbox.Button className='w-32 border-2 relative bg-light py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-light focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-dark'>
+            <Listbox.Button className='w-32 border-2 relative bg-light py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-light focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-dark dark:text-dark'>
               <span className='block truncate'>{selected.name}</span>
               <span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
                 <ChevronDownIcon
@@ -174,7 +148,7 @@ export default function Dashboard() {
               leaveFrom='opacity-100'
               leaveTo='opacity-0'
             >
-            <Listbox.Options className='w-32 absolute mt-1 max-h-60 overflow-auto bg-light py-1 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
+            <Listbox.Options className='w-32 absolute mt-1 max-h-60 overflow-auto bg-light py-1 text-base shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:text-dark'>
               {roleDisplays.map((roleDisplay: {name: string, lowercaseName: string}, roleIdx: number) => (
                 <Listbox.Option
                   key={roleIdx}
@@ -188,7 +162,7 @@ export default function Dashboard() {
                   {({ selected }) => (
                     <>
                       <span
-                        className={`block truncate ${
+                        className={`block truncate dark:text-dark ${
                           selected ? 'font-medium': 'font-normal'
                         }`}
                       >
@@ -209,7 +183,7 @@ export default function Dashboard() {
             <button
               type='button'
               onClick={() => setIsCreateOpen(true)}
-              className='relative border-2 ml-2 w-44 bg-light p-2 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-light focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-dark'
+              className='relative border-2 ml-2 w-44 bg-light p-2 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-light focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-dark dark:text-dark'
             >
               Create new {selected.lowercaseName}
             </button>
@@ -459,6 +433,6 @@ export default function Dashboard() {
           </div>
         </Dialog>
       </Transition>
-      </>
+      </main>
     )
 }
