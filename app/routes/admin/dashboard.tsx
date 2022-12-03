@@ -314,7 +314,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   }
-                  <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>
+                  <input type='hidden' name='redirectUri' value={'/admin/dashboard?view=' + selected.lowercaseName}/>
                 <div className='mt-4 flex justify-center'>
                   <button
                     type='submit'
@@ -416,7 +416,7 @@ export default function Dashboard() {
                   <input type='hidden' name='companyId' value={(selectedEdit as CompanyDto | null)?.id}/>
                   </>
                   }
-                  <input type='hidden' name='redirectUri' value={'/dashboard?view=' + selected.lowercaseName}/>
+                  <input type='hidden' name='redirectUri' value={'/admin/dashboard?view=' + selected.lowercaseName}/>
                 <div className='mt-4 flex justify-center'>
                   <button
                     type='submit'
