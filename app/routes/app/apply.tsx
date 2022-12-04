@@ -1,44 +1,75 @@
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Role, SsoProvider } from '@prisma/client';
-import { ActionFunction, DataFunctionArgs, json } from '@remix-run/server-runtime';
-import { containsHtml } from '../../shared_functions';
+import { Formik, Field, ErrorMessage } from 'formik';
+import { Company, EnrollmentStatus, Role, SsoProvider } from '@prisma/client';
+import { ActionFunction, DataFunctionArgs, json, LoaderFunction, redirect } from '@remix-run/server-runtime';
+import { cognitoCreateUser, containsHtml } from '../../shared_functions';
 import { prisma } from '../../../server';
-import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import { CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
+import { CompanyDto } from '../../models/dto';
+import { useLoaderData, Form} from '@remix-run/react';
 
 export const action: ActionFunction = async ({request}: DataFunctionArgs): Promise<Response> => {
 
   const form = await request.formData();
-  const [firstName, lastName, email] = [form.get('firstName'), form.get('lastName'), form.get('email')];
-  const errors: {firstName?: string, lastName?: string, email?: string} = {};
-  const name = firstName + " " + lastName;
+  const [firstNameUnchecked, lastNameUnchecked, emailUnchecked, companyIdStrUnchecked, reasonUnchecked] =
+    [form.get('firstName'), form.get('lastName'), form.get('email'), form.get('companyId'), form.get('reason')];
+  const errors: {firstName?: string, lastName?: string, email?: string, companyId?: string, reason?: string} = {};
+
   // validate the fields
   // note: here I'm doing xss validation on input. this is fine for our purposes, but encoding on
   // output is more robust. see: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#output-encoding
-  if (typeof firstName !== 'string' || containsHtml(firstName))
+  if (typeof firstNameUnchecked !== 'string' || containsHtml(firstNameUnchecked))
     errors.firstName = 'Invalid first name';
-  if (typeof lastName !== 'string' || containsHtml(lastName))
+  if (typeof lastNameUnchecked !== 'string' || containsHtml(lastNameUnchecked))
     errors.lastName = 'Invalid last name';
-  if (typeof email !== 'string' || containsHtml(email) || !email.includes('@'))
+  if (typeof emailUnchecked !== 'string' || containsHtml(emailUnchecked) || !emailUnchecked.includes('@'))
     errors.email = 'Invalid email address';
+  if (typeof companyIdStrUnchecked !== 'string' || containsHtml(companyIdStrUnchecked))
+    errors.companyId = 'Invalid company id';
+  const companyIdNum = parseInt(companyIdStrUnchecked as string);
+  if (isNaN(companyIdNum))
+      errors.companyId = 'Invalid company id';
+  if (typeof reasonUnchecked !== 'string' || containsHtml(reasonUnchecked))
+    errors.reason = 'Invalid reason';
   if (Object.keys(errors).length)
     return json(errors, { status: 422 });
 
-  // we could add some try catches here for graceful error handling
+  // these type assertions are safe because of validation above
+  const [name, email, reason] =
+    [(firstNameUnchecked as string + lastNameUnchecked as string), emailUnchecked as string, reasonUnchecked as string];
+
+  const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
+  const cognitoUsername = (await cognitoCreateUser(client, email, name)).User!.Username!;
+
   const user = await prisma.user.create({ data: {
-    name: (name as string),
-    email: (email as string), // this type assertion is safe because of validation above
-    ssoProvider: SsoProvider.COGNITO_USER_POOL,
-    // TODO: Implement w/ cognito id
-    ssoIdentifier: (email as string),
-    role: Role.ADMIN
+      email,
+      name,
+      ssoProvider: SsoProvider.COGNITO_USER_POOL,
+      ssoIdentifier: cognitoUsername,
+      role: Role.DRIVER
+    }});
+  await prisma.driver.create({ data: {
+    userId: user.id,
+    companyId: companyIdNum,
+    enrollmentStatus: EnrollmentStatus.APPLICATION_PENDING,
   }});
-  await prisma.admin.create({ data: { userId: user.id }});
-  return new Response(null, {status: 200})
+  await prisma.driverApplication.create({ data: {
+    driverId: user.id,
+    applicationReason: reason,
+    applicationPdfUrl: '',
+    companyId: companyIdNum,
+  }});
+
+  return redirect("/app");
+}
+
+export const loader: LoaderFunction = async (): Promise<CompanyDto[]> => {
+  const companies: Company[] = await prisma.company.findMany({ where: { isActive: true }});
+  return companies.map((company: Company) => CompanyDto.fromCompany(company));
 }
 
 export default function Apply() {
-  const navigate = useNavigate()
+  const companyDtos: CompanyDto[] = useLoaderData();
 
   return (
     <>
@@ -70,7 +101,7 @@ export default function Apply() {
           }, 400);
         }}
       >
-        <Form>
+        <Form method="post">
           <div className="sm:flex items-center justify-center text-center bg-light text-dark text-xl font-medium dark:bg-dark dark:text-light">
             <div className="max-w-3xl p-8 sm:m-8 border-2 border-lightgray shadow-xl text-center grid grid-flow-row auto-rows-max">
               <div className="pb-4 text-primary text-2xl font-bold border-b-2 mb-4">
@@ -97,10 +128,16 @@ export default function Apply() {
                 
                 {/* Company */}
                 <div className="block mb-4">
-                  <label>Company name</label>
-                  <Field name="company" type="text" placeholder="T25 WES" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md dark:text-dark"/>
-                  <div className="text-red-500 text-lg">
-                    <ErrorMessage name="company"/>
+                  <label className='block tracking-wide text-gray-700 text-xs font-bold mb-2' htmlFor='grid-state'>
+                    Company
+                  </label>
+                  <div className='relative'>
+                    <Field as="select" name="companyId" className="w-full px-4 py-2 min-w-38 border-2 border-lightgray shadow-md dark:text-dark">
+                      <option hidden></option>
+                      {companyDtos.map((company) =>
+                        <option key={company.id} value={company.id.toString()}>{company.name}</option>
+                      )}
+                    </Field>
                   </div>
                 </div>
               </div>
@@ -116,7 +153,7 @@ export default function Apply() {
               {/* Reason for application */} 
               <div className="block text-start">
                 <label>Reason</label>
-                <textarea id="large-input" placeholder="Why are you applying with us?" className="w-full block px-4 py-2 mb-4 border-2 border-lightgray shadow-md dark:text-dark"/>
+                <textarea id="large-input" name="reason" placeholder="Why are you applying with us?" className="w-full block px-4 py-2 mb-4 border-2 border-lightgray shadow-md dark:text-dark"/>
               </div>
 
               {/* Submit */} 
@@ -124,7 +161,6 @@ export default function Apply() {
                 <button 
                   className="px-4 py-2 border-2 border-lightgray dark:border-darkgray dark:bg-dark hover:border-primary hover:bg-dark hover:text-light dark:hover:bg-light dark:hover:text-dark dark:hover:border-primary shadow-md"
                   type="submit"
-                  onClick={() => navigate("/app")}
                 >
                   Submit
                 </button>

@@ -114,6 +114,7 @@ model DriverApplication {
   isActive Boolean @default(true)
   driver Driver @relation(fields: [driverId], references: [userId])
   driverId Int
+  applicationReason String @db.Text
   applicationPdfUrl String
   approver Sponsor? @relation(fields: [approverId], references: [userId])
   approverId Int?

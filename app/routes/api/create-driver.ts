@@ -48,7 +48,7 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
   await prisma.driver.create({ data: {
     userId: user.id,
     companyId: companyIdNum,
-    enrollmentStatus: EnrollmentStatus.NOT_APPLIED,
+    enrollmentStatus: EnrollmentStatus.ENROLLED,
   }});
   return redirect(redirectUri);
 }
