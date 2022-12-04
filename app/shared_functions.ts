@@ -63,3 +63,23 @@ export async function cognitoAdminRemoveUserFromGroup(client: CognitoIdentityPro
     throw new Error("Network failure on Cognito AdminRemoveUserFromGroup call\n" + e);
   }
 }
+
+export function parseJwt(token: string) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+}
+
+export function parseCookie(str: string) {
+  return str
+    .split(';')
+    .map(v => v.split('='))
+    .reduce((acc: {[key: string]: string}, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
+}

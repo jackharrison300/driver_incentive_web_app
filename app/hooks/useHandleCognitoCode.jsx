@@ -1,14 +1,6 @@
 import { useEffect } from "react";
+import { parseJwt } from "../shared_functions";
 
-function parseJwt (token) {
-  var base64Url = token.split('.')[1];
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-
-  return JSON.parse(jsonPayload);
-}
 const useHandleCognitoCode = () => {
     useEffect (() => {
       const queryParam = window.location.search;
@@ -51,7 +43,8 @@ const useHandleCognitoCode = () => {
 
         const res_json = await res.json();
         console.log(res_json)
-        // store JWT (but not actually. This usually fails)
+        // store JWT
+        document.cookie = 'id_token=' + res_json.id_token;
         sessionStorage.setItem('id_token', res_json.id_token);
         sessionStorage.setItem('access_token', res_json.access_token);
         sessionStorage.setItem('refresh_token', res_json.refresh_token);
@@ -59,7 +52,7 @@ const useHandleCognitoCode = () => {
         console.log('stored some cookies... 🍪🍪🍪')
 
         const userInfo = parseJwt(res_json.id_token);
-        console.log(userInfo)
+        sessionStorage.setItem('user_info', userInfo);
         const userPools = userInfo['cognito:groups'];
 
         if (userPools === undefined) window.location.replace("/app/apply");

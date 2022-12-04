@@ -1,20 +1,31 @@
 import { useLoaderData, Form, useLocation } from '@remix-run/react';
 import { LoaderFunction } from '@remix-run/server-runtime';
 import { useTable, Column, TableOptions } from 'react-table';
-import React, { Fragment, useState } from 'react';
-import { User, Role, Company, Sponsor } from '@prisma/client';
+import React, { Fragment, useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { Role, Company } from '@prisma/client';
 import { prisma } from '../../../server';
 import { CompanyDto, DriverDto, SponsorDto, UserDto } from '../../models/dto';
 import { UserWithDriverWithCompany, UserWithSponsorWithCompany } from '../../models/shared_prisma';
 import { Dialog, Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
+import { parseJwt, parseCookie } from "../../shared_functions";
 
 type DashboardData = { sponsorDtos: SponsorDto[], driverDtos: DriverDto[], companyDtos: CompanyDto[]};
 type DashboardUserDto = UserDto | SponsorDto | DriverDto;
 type DashboardDto = DashboardUserDto | CompanyDto;
 
-export const loader: LoaderFunction = async (): Promise<DashboardData> => {
-  // TODO AUTH
+export const loader: LoaderFunction = async ({request}): Promise<DashboardData |  null> => {
+  const cookies = request.headers.get('cookie');
+  if (!cookies) return null;
+  const id_token = parseCookie(cookies!).id_token;
+  if (!id_token) return null;
+  const userInfo = parseJwt(id_token);
+  const userGroups = userInfo['cognito:groups'];
+  if (userGroups === undefined) return null;
+  const [companyIdStr, role] = userGroups[0].split('_');
+  if (role !== 'sponsors') return null;
+  const companyId = parseInt(companyIdStr);
 
   // doing the filter concurrently in-db seems simplest and likely fastest at low scale where a connection
   // limit >= 3 per lambda instance is doable. at high scale in which a connection limit of 1 may be required
@@ -26,9 +37,27 @@ export const loader: LoaderFunction = async (): Promise<DashboardData> => {
     companies
   ]: [ UserWithSponsorWithCompany[], UserWithDriverWithCompany[], Company[]] =
   await Promise.all([
-    prisma.user.findMany({ where: { isActive: true, role: Role.SPONSOR }, include: { sponsor: { include: { company: true }}}}),
-    prisma.user.findMany({ where: { isActive: true, role: Role.DRIVER }, include: { driver: { include: { company: true }}}}),
-    prisma.company.findMany({ where: { isActive: true }}),
+    prisma.user.findMany({
+      where: { 
+        isActive: true, 
+        role: Role.SPONSOR,
+        driver: {
+          is: { companyId }
+        }
+      },
+      include: { sponsor: { include: { company: true }}}
+    }),
+    prisma.user.findMany({
+      where: { 
+        isActive: true, 
+        role: Role.DRIVER,
+        driver: {
+          is: { companyId }
+        }
+      },
+      include: { driver: { include: { company: true }}}
+    }),
+    prisma.company.findMany({ where: { isActive: true, id: companyId }}),
   ]);
   const sponsorDtos: SponsorDto[] = sponsorUsers.map((user: UserWithSponsorWithCompany) => SponsorDto.fromUserWithSponsorWithCompany(user));
   const driverDtos: DriverDto[] = driverUsers.map((user: UserWithDriverWithCompany) => DriverDto.fromUserWithDriverWithCompany(user));
@@ -37,8 +66,14 @@ export const loader: LoaderFunction = async (): Promise<DashboardData> => {
 }
 
 export default function Dashboard() {
-    const data: DashboardData = useLoaderData();    
-
+    const navigate = useNavigate();
+    useEffect (() => {
+      const id_token = sessionStorage.getItem('id_token');
+      if (id_token === undefined) navigate('/');
+    });
+    const uncheckedData: DashboardData | null = useLoaderData();
+    if (!uncheckedData) return ("Auth Failed");
+    const data = uncheckedData as DashboardData;
     const roleDisplays = React.useMemo(() => [
       { name: 'Sponsor', lowercaseName: 'sponsor' },
       { name: 'Driver',  lowercaseName: 'driver'  },
@@ -61,7 +96,7 @@ export default function Dashboard() {
     function setSelectEditCompany() {
       if (['Sponsor', 'Driver'].includes(selected.name)) {
         const companyIdx: number = data.companyDtos.findIndex(co => co.name === (selectedEdit as SponsorDto | DriverDto)?.companyName);
-        const companyElement = document.getElementById('edit-user-company') as HTMLSelectElement;
+        const companyElement = document.getElementById('edit-user-company') as unknown as HTMLSelectElement;
         companyElement.options[companyIdx].selected = true;
       }
     }
@@ -175,6 +210,7 @@ export default function Dashboard() {
             </Listbox.Options>
           </Transition>
           </Listbox>
+            {selected.name !== 'Company' &&
             <button
               type='button'
               onClick={() => setIsCreateOpen(true)}
@@ -182,6 +218,7 @@ export default function Dashboard() {
             >
               Create new {selected.lowercaseName}
             </button>
+            }
           <table {...getTableProps()} className='text-xl mt-2 shadow-xl'>
             <thead>
               {headerGroups.map(headerGroup => (
