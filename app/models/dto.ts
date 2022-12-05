@@ -91,12 +91,14 @@ export class PtChangeDto {
     companyId: number
     driverId: number
     pointValue: number
+    pointChangeReason: string
 
     constructor(PtChangeDto: Partial<PtChangeDto>){
         this.createdAt = PtChangeDto.createdAt!
         this.companyId = PtChangeDto.companyId ?? 0
         this.driverId = PtChangeDto.driverId ?? 0
         this.pointValue = PtChangeDto.pointValue ?? 0
+        this.pointChangeReason = PtChangeDto.pointChangeReason ?? ''
     }
 
     static fromPtChange(pointChange: PointChange){
