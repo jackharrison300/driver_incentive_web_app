@@ -25,6 +25,8 @@ Resources:
         - email
       Schema:
         - Name: email
+          Required: true        
+        - Name: name
           Required: true
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
