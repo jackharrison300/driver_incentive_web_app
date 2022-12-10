@@ -5,7 +5,7 @@ import { UserDto } from '../../models/dto';
 import { LoaderFunction, ActionFunction, DataFunctionArgs, redirect } from '@remix-run/server-runtime';
 import { useLoaderData } from '@remix-run/react';
 import { useState } from 'react';
-import { containsHtml } from '../../shared_functions';
+import { containsHtml, parseCookie, parseJwt } from '../../shared_functions';
 import { Form } from '@remix-run/react';
 import {useNavigate} from 'react-router-dom';
 
@@ -14,11 +14,22 @@ const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp"
 const indexUrl = "https://61rc2moud3.execute-api.us-east-1.amazonaws.com/"
 
 // pulling info from the DB based on email
-export const loader: LoaderFunction = async ({
-}): Promise<UserDto> => {
+export const loader: LoaderFunction = async ({ request }): Promise<UserDto> => {
+    
+  const cookies = request.headers.get('cookie');
+  let email;
+  if (cookies) {
+    const id_token = parseCookie(cookies!).id_token;
+    const userInfo = parseJwt(id_token);
+    email = userInfo['email']
+  } 
+  else { 
+    email = 'ljbarro@clemson.edu';
+  }
+
   // TODO AUTH
   // TODO fix hardcoding
-  const myUser: User = (await prisma.user.findUnique({ where: { id: myId }}))!;
+  const myUser: User = (await prisma.user.findUnique({ where: { email }}))!;
   return new UserDto(myUser);
 }
 

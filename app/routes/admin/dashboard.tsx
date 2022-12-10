@@ -80,6 +80,7 @@ export default function Dashboard() {
     const sponsorColumns: Column[] = React.useMemo(() => [
       ...userColumns,
       { Header: 'Company', accessor: 'companyName'},
+      { Header: '', accessor: 'companyId'},
       ],
       []
     );
@@ -88,6 +89,7 @@ export default function Dashboard() {
       ...userColumns,
       { Header: 'Company', accessor: 'companyName'},
       { Header: 'Enrollment Status', accessor: 'enrollmentStatus'},
+      { Header: '', accessor: 'companyId'},
       ],
       []
     );
@@ -95,15 +97,16 @@ export default function Dashboard() {
     const companyColumns: Column[] = React.useMemo(() => [
       { Header: 'Name', accessor: 'name'},
       { Header: 'Point Value ($)', accessor: 'pointDollarValue'},
+      { Header: '', accessor: 'id'},
       ],
       []
     );
 
     function getTableOptionsFromRoleName(roleName: string): TableOptions<{}> {
       if ('Admin'=== roleName) return {data: data.adminDtos, columns: userColumns};
-      if ('Sponsor'=== roleName) return {data: data.sponsorDtos, columns: sponsorColumns};
-      if ('Driver'=== roleName) return {data: data.driverDtos, columns: driverColumns};
-      return {data: data.companyDtos, columns: companyColumns};
+      if ('Sponsor'=== roleName) return {data: data.sponsorDtos, columns: sponsorColumns, initialState: { hiddenColumns: ['companyId'] }};
+      if ('Driver'=== roleName) return {data: data.driverDtos, columns: driverColumns, initialState: { hiddenColumns: ['companyId'] }};
+      return {data: data.companyDtos, columns: companyColumns, initialState: { hiddenColumns: ['id'] }};
     }
 
     const {

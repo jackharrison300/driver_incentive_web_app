@@ -39,7 +39,7 @@ export const action: ActionFunction = async ({request}: DataFunctionArgs): Promi
     [(firstNameUnchecked as string + lastNameUnchecked as string), emailUnchecked as string, reasonUnchecked as string];
 
   const client = new CognitoIdentityProviderClient({ region: 'us-east-1' });
-  const cognitoUsername = (await cognitoCreateUser(client, email, name)).User!.Username!;
+  const cognitoUsername = email;
 
   const user = await prisma.user.create({ data: {
       email,

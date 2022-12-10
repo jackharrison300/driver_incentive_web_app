@@ -2,7 +2,7 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "t25prod"
+stack_name = "team25prod"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-13n55ugs28wd5"
 s3_prefix = "t25prod"
 region = "us-east-1"

@@ -13,7 +13,7 @@ const useHandleCognitoCode = () => {
       const currURL = (process.env.NODE_ENV == "development") ? 'http://localhost:3000' :
         'https://' + window.location.hostname;
       // const cognitoClientId = process.env.COGNITO_CLIENT_ID;
-      const cognitoClientId = "5lmi5ls07ca66e0ult69ca6tmp";
+      const cognitoClientId = "2ppasq2dta03g3sk5vl8ouh8i2";
       // const cognitoURL = process.env.COGNITO_URL;
       const cognitoURL = "https://t25.auth.us-east-1.amazoncognito.com";
 

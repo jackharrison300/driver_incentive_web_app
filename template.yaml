@@ -27,7 +27,8 @@ Resources:
         - Name: email
           Required: true        
         - Name: name
-          Required: true
+          Required: false
+          Mutable: true
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:

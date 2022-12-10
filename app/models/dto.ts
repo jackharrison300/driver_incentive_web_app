@@ -24,7 +24,11 @@ export class SponsorDto extends UserDto {
     }
 
     static fromUserWithSponsorWithCompany(user: UserWithSponsorWithCompany) {
-        return new SponsorDto({...user, companyName: user.sponsor?.company.name });
+        return new SponsorDto({
+            ...user,
+            companyId: user.sponsor?.company.id,
+            companyName: user.sponsor?.company.name
+        });
     }
 }
 
@@ -43,6 +47,7 @@ export class DriverDto extends UserDto {
     static fromUserWithDriverWithCompany(user: UserWithDriverWithCompany) {
         return new DriverDto({
             ...user,
+            companyId: user.driver?.company?.id,
             companyName: user.driver?.company?.name,
             enrollmentStatus: user.driver?.enrollmentStatus
         });
